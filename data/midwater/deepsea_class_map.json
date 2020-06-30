@@ -1,0 +1,12 @@
+{
+    "items":[
+      {
+        "id": 1,
+        "map": [{"name": "MITROCOMA", "description": "Mitrocoma", "color": "57 186 232"}]
+      },
+      {
+        "id": 2,
+        "map": [{"name": "KRILL", "description": "Krill", "color": "88 179 169"}]
+      }
+    ]
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<annotation>
+	<folder>imgs</folder>
+	<filename>D0232_03HD_60s_00-00-00.png</filename>
+	<size>
+		<width>2048</width>
+		<height>1080</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>MICROSTOMUS</name>
+		<confidence>0.9972512</confidence>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<occluded>0</occluded>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>712</xmin>
+			<ymin>51</ymin>
+			<xmax>1131</xmax>
+			<ymax>602</ymax>
+		</bndbox>
+	</object>
+</annotation>
