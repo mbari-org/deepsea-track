@@ -1,7 +1,10 @@
 [MBARI](https://www.mbari.org/wp-content/uploads/2014/11/logo-mbari-3b.png)
-<p align="right">
+<p align="center">
     <b> <img src="https://img.shields.io/badge/Supported%20Platforms-Windows%20%7C%20macOS%20%7C%20Linux-green" title="Supported Platforms"/> </b> <br>
     <b> <img src="https://img.shields.io/badge/license-GPL-blue" title="license-GPL"/> </b> <br>
+ <a href="https://codecov.io/gh/semantic-release/semantic-release">
+    <img alt="Codecov" src="https://img.shields.io/codecov/c/github/semantic-release/semantic-release/master.svg">
+  </a>
 </p>
 
 # About
