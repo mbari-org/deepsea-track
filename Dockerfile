@@ -36,8 +36,8 @@ RUN curl -L https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.1
 # ================================================================
 # Clone repositories
 RUN cd /opt/ && \
-    git clone https://github.com/opencv/opencv.git && \
-    git clone https://github.com/opencv/opencv_contrib.git
+    git clone https://github.com/opencv/opencv.git /opt/opencv && \
+    git clone https://github.com/opencv/opencv_contrib.git /opt/opencv_contrib
 
 # Create the temporary build directory and build using CMake.
 RUN cd /opt/opencv && \
@@ -78,7 +78,9 @@ RUN cd /home/deepsea-track && \
     mkdir thirdparty && \
     git clone https://github.com/nlohmann/json ./thirdparty
 
-RUN /opt/bin/cmake ./ && \
+RUN cd /home/deepsea-track/ && \
+    cmake --version && \
+    cmake ./ && \
     make
 
 #RUN cd /home/ && \
