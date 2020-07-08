@@ -7,26 +7,25 @@ FROM zouzias/boost:1.73.0
 
 MAINTAINER Peyton Lee <plee@mbari.org>
 
-RUN apt-get update
-
 # Get dependencies
-RUN apt-get install -y build-essential cmake git pkg-config libgtk-3-dev \
+RUN apt-get update && \
+    apt-get install -y build-essential cmake git pkg-config libgtk-3-dev \
     libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
     libxvidcore-dev libx264-dev libjpeg-dev libpng-dev libtiff-dev \
     gfortran openexr libatlas-base-dev python3-dev python3-numpy \
-    libtbb2 libtbb-dev libdc1394-22-dev
+    libtbb2 libtbb-dev libdc1394-22-dev curl    
 
-RUN apt-get install -y curl    
-
-RUN apt-get install -y libboost-all-dev
+RUN apt-get update && \
+    apt-get install -y libboost-all-dev
 
 # Install CMake
 RUN curl -L https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3-Linux-x86_64.sh \
     --output /opt/cmake-3.17.3-Linux-x86_64.sh && \
     chmod +x /opt/cmake-3.17.3-Linux-x86_64.sh && \ 
     /opt/cmake-3.17.3-Linux-x86_64.sh --skip-license && \
-    rm /opt/bin/cmake && \
-    ln -s /opt/bin/cmake /usr/bin
+    rm -f /bin/cmake && \
+    ln -s /opt/bin/cmake /bin/cmake && \
+    cmake --version
 
 # ================================================================
 # Download OpenCV and build for source using CMake.
@@ -69,16 +68,16 @@ RUN cd /opt/ && \
 # Download and build the deepsea-track repository
 # ================================================================
 # Get the deepsea-track directory
-RUN cd /home/ && \
-    git clone https://plee-mbari@bitbucket.org/mbari/deepsea-track.git && \
-    cd deepsea-track
+#RUN cd /home/ && \
+#    git clone https://plee-mbari@bitbucket.org/mbari/deepsea-track.git && \
+#    cd deepsea-track
 
 # Create a thirdparty directory and add the nlohmann-json library
-RUN mkdir thirdparty && \
-    git clone https://github.com/nlohmann/json ./thirdparty
+#RUN mkdir thirdparty && \
+#    git clone https://github.com/nlohmann/json ./thirdparty
 
 # Ready to run CMake!
-RUN cmake ./ && \
-    make
+#RUN /opt/bin/cmake ./ && \
+#    make
 
 
