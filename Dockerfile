@@ -24,10 +24,13 @@ RUN apt-get update && \
 RUN curl -L https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3-Linux-x86_64.sh \
     --output /opt/cmake-3.17.3-Linux-x86_64.sh && \
     chmod +x /opt/cmake-3.17.3-Linux-x86_64.sh && \ 
-    /opt/cmake-3.17.3-Linux-x86_64.sh --skip-license && \
+    mkdir /opt/cmake && \
+    /opt/cmake-3.17.3-Linux-x86_64.sh --skip-license --prefix=/opt/cmake/ && \
     rm -f /bin/cmake && \
-    ln -s /opt/bin/cmake /bin/cmake && \
+    ln -s /opt/cmake/bin/cmake /bin/cmake && \
+    /opt/cmake/bin/cmake --version && \
     cmake --version
+
 
 # ================================================================
 # Download OpenCV and build for source using CMake.
@@ -64,8 +67,8 @@ RUN cd /opt/ && \
     cd xerces-c-3.2.3 && \
     cmake ./ && \
     make && \
-    make install
-    
+    make install 
+RUN apt install -y libxerces-c3.2    
 
 # ================================================================
 # Download and build the deepsea-track repository
@@ -78,8 +81,8 @@ RUN cd /home/deepsea-track && \
     git clone https://github.com/nlohmann/json ./thirdparty
 
 RUN cd /home/deepsea-track/ && \
-    /opt/bin/cmake --version && \
-    /opt/bin/cmake ./ && \
+    /opt/cmake/bin/cmake --version && \
+    /opt/cmake/bin/cmake ./ && \
     make
 
 #RUN cd /home/ && \
@@ -91,7 +94,7 @@ RUN cd /home/deepsea-track/ && \
 #    git clone https://github.com/nlohmann/json ./thirdparty
 
 # Ready to run CMake!
-#RUN /opt/bin/cmake ./ && \
+#RUN /opt/cmake/bin/cmake ./ && \
 #    make
 
 
