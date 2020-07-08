@@ -27,8 +27,7 @@ RUN curl -L https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.1
     /opt/cmake-3.17.3-Linux-x86_64.sh --skip-license && \
     rm -f /bin/cmake && \
     ln -s /opt/bin/cmake /bin/cmake && \
-    cmake --version \
-    rm /opt/cmake-3.17.3-Linux-x86_64.sh \
+    cmake --version
 
 # ================================================================
 # Download OpenCV and build for source using CMake.
@@ -79,8 +78,8 @@ RUN cd /home/deepsea-track && \
     git clone https://github.com/nlohmann/json ./thirdparty
 
 RUN cd /home/deepsea-track/ && \
-    cmake --version && \
-    cmake ./ && \
+    /opt/bin/cmake --version && \
+    /opt/bin/cmake ./ && \
     make
 
 #RUN cd /home/ && \
