@@ -8,12 +8,12 @@ FROM zouzias/boost:1.73.0
 MAINTAINER Peyton Lee <plee@mbari.org>
 
 # Get dependencies
-RUN apt-get update && \
+RUN apt-get update --fix-missing && \
     apt-get install -y build-essential cmake git pkg-config libgtk-3-dev \
     libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
     libxvidcore-dev libx264-dev libjpeg-dev libpng-dev libtiff-dev \
     gfortran openexr libatlas-base-dev python3-dev python3-numpy \
-    libtbb2 libtbb-dev libdc1394-22-dev curl    
+    libtbb2 libtbb-dev libdc1394-22-dev curl
 
 RUN apt-get update && \
     apt-get install -y libboost-all-dev
@@ -26,6 +26,7 @@ RUN curl -L https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.1
     rm -f /bin/cmake && \
     ln -s /opt/bin/cmake /bin/cmake && \
     cmake --version
+    rm /opt/cmake-3.17.3-Linux-x86_64.sh \
 
 # ================================================================
 # Download OpenCV and build for source using CMake.
@@ -49,9 +50,10 @@ RUN cd /opt/opencv && \
     -D BUILD_DOCS=OFF \
     -D BUILD_PERF_TESTS=OFF \
     -D BUILD_TESTS=OFF \
-    -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules .. && \
+    -D OPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib/modules \
+    /opt/opencv/ && \
     make -j4 && \
-    make install
+    make install    
 
 # Install Xerces-C
 RUN cd /opt/ && \
