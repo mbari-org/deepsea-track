@@ -7,6 +7,8 @@ FROM zouzias/boost:1.73.0
 
 MAINTAINER Peyton Lee <plee@mbari.org>
 
+RUN chmod 1777 /tmp
+
 # Get dependencies
 RUN apt-get update --fix-missing && \
     apt-get install -y build-essential cmake git pkg-config libgtk-3-dev \
@@ -70,6 +72,15 @@ RUN cd /opt/ && \
 # Download and build the deepsea-track repository
 # ================================================================
 # Get the deepsea-track directory
+COPY . /home/deepsea-track
+
+RUN cd /home/deepsea-track && \
+    mkdir thirdparty && \
+    git clone https://github.com/nlohmann/json ./thirdparty
+
+RUN /opt/bin/cmake ./ && \
+    make
+
 #RUN cd /home/ && \
 #    git clone https://plee-mbari@bitbucket.org/mbari/deepsea-track.git && \
 #    cd deepsea-track
