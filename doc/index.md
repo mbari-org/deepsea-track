@@ -1,6 +1,6 @@
-# avedac-vision 
+# deepsea-track
  
-Documentation on how to use to <b>avedac-vision</b> to automate visual detection, classification and tracking of visualevents in underwater video.
+Documentation on how to use to <b>deepsea-track</b> to automate tracking of visualevents in underwater video.
 
 @copyright Copyright &copy; 2020 MBARI. 
 
