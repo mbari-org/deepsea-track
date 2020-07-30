@@ -1,11 +1,10 @@
 FROM zouzias/boost:1.73.0
 # ================================================================
-# Docker Image for deepsea-track
-# See https://bitbucket.org/mbari/deepsea-track/src/master/
+# Docker Image for mbari/deepsea-track
 # ================================================================
 # Get base image, which has boost installed by default.
 
-MAINTAINER Peyton Lee <plee@mbari.org>
+MAINTAINER Peyton Lee <plee@mbari.org>, Danelle Cline <dcine@mbari.org>
 
 RUN chmod 1777 /tmp
 
@@ -15,10 +14,7 @@ RUN apt-get update --fix-missing && \
     libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
     libxvidcore-dev libx264-dev libjpeg-dev libpng-dev libtiff-dev \
     gfortran openexr libatlas-base-dev python3-dev python3-numpy \
-    libtbb2 libtbb-dev libdc1394-22-dev curl
-
-RUN apt-get update && \
-    apt-get install -y libboost-all-dev
+    libtbb2 libtbb-dev libdc1394-22-dev curl libboost-all-dev
 
 # Install CMake
 RUN curl -L https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3-Linux-x86_64.sh \
@@ -85,16 +81,5 @@ RUN cd /home/deepsea-track/ && \
     /opt/cmake/bin/cmake ./ && \
     make
 
-#RUN cd /home/ && \
-#    git clone https://plee-mbari@bitbucket.org/mbari/deepsea-track.git && \
-#    cd deepsea-track
-
-# Create a thirdparty directory and add the nlohmann-json library
-#RUN mkdir thirdparty && \
-#    git clone https://github.com/nlohmann/json ./thirdparty
-
-# Ready to run CMake!
-#RUN /opt/cmake/bin/cmake ./ && \
-#    make
-
+ENTRYPOINT /home/deepsea-track/deepsea-track
 
