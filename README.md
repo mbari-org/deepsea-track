@@ -10,8 +10,9 @@
 *deepsea-track* is lightweight tracking software for tracking multiple objects in deep sea underwater video.
 It is designed to be used with output from object detection from [deepsea-tfdetect](https://github.com/mbari-org/deepsea-tfdetect)
 which generate collections of XML files in [PASCAL VOC](http://host.robots.ox.ac.uk/pascal/VOC/) format but 
-can be used with any output generated in XML format. It generates unique *VisualEvent* track sequences for analysis.
+can be used with any output generated in XML format. It generates unique *VisualEvent* track sequences for analysis in JSON format.
 
+[click image below to see example in YouTube]
 [![Example video output](https://img.youtube.com/vi/cMZ8vr0aAYI/maxresdefault.jpg)](https://youtu.be/cMZ8vr0aAYI)
 
 # Questions?
@@ -24,50 +25,60 @@ https://www.mbari.org/cline-danelle-e/
 ---
 
 # Requirements
-- (optional) [Docker](www.docker.com)
+- [Docker](www.docker.com)
 
-Alternatively, can be built natively for Mac with:
+Alternatively, can be built natively for Mac with
+
 - A compiler that support >= C++11
 - [CMake `>= 3.1`](https://cmake.org/download/)
 - [HomeBrew](https://brew.sh/) for Mac OS install
 
 ---
 
-### How to use deepsea-track
+## How to use deepsea-track
 
-* Create a folder, e.g. "benthic" below and add your video, class map, configuration file and location
- for the results, e.g.:
+* Create a folder, e.g. "benthic" and add your video, class map, configuration file and folder
+ to store the results, e.g.:
         
-    ```bash
+    ```
   
     │   └── benthic
     │       ├── video.mp4
     │       ├── deepsea_class_map.json
-    │       ├── deepsea_cfg.json
+    │       ├── f001000.json
+    │       ├── f001001.json
+    │       ├── f001002.json
+    │       ...
+    │       ├── f001010.json
     │   └── benthic_results
   
     ```
 
 ### Docker
 
-A docker image is avaiabe in dockerhub.com at https://hub.docker.com/u/mbari/deepsea-track
+A docker image is available in dockerhub.com at https://hub.docker.com/u/mbari/deepsea-track
 
-* Run with 
+Run with 
 
+- path to video/xml - both must be in the same directory
+- path to store results
+- start frame - 6-digit frame prefix to start, by default will process until the end of of the xml sequence.
+- frame resize ratio ratio between 0-1.0 to resize the input video. Smaller resize ratio will process faster.
+- stride(optional) - amount to stride between frames. Default is 1. Larger stride will process faster.
 ```
-docker run -it --rm -v $PWD:/data mbari/deepsea-track <video_name> <path to xml> <start frame num> <frame resize ratio> <stride(optional)>
+docker run -it --rm -v $PWD:/data mbari/deepsea-track <path to video/xml> <path to store results> <start frame num> <frame resize ratio> <stride(optional)>
 ```
 
 e.g.
 
 ```
-docker run -it --rm -v $PWD:/data mbari/deepsea-track   /data/benthic/video.mp4  /data/benthic_results 1 0.5
+docker run -it --rm -v $PWD:/data mbari/deepsea-track  /data/benthic/video.mp4  /data/benthic_results 1 0.5
 ```
 
 Frames and output will be rescaled by 0.5 in width and height in the above example.
 Output will look like:
       
-    ```bash
+    ```
     
     │   └── benthic_results
     │       ├── f000001.json
@@ -85,8 +96,8 @@ TODO: add details on .json output
 
 ### Configuration files
 
-* The *deep_class_map.json* should contain the mapping from your IDs to actual class names,
- human-readable descriptions and colors to associate to each class, e.g.
+The *deep_class_map.json* should contain the mapping from your IDs to actual class names.
+This is human-readable descriptions and colors to associate to each class, e.g.
 ```
 {
     "items":[
@@ -102,7 +113,7 @@ TODO: add details on .json output
 }
 ```
 
-* The *deepsea_cfg.json* should contain the index for the type of tracker you'd like to use:
+The *deepsea_cfg.json* should contain the index for the type of tracker you'd like to use:
 These correspond to 4 of the 8 available [OpenCV](https://docs.opencv.org/) trackers.
 
 | id   | Tracker           |
@@ -138,14 +149,14 @@ e.g. this uses a combined MEDIANFLOW and KCF tracker:
 | tracker1 | The primary tracker - must be a valid id  |
 | tracker2 | Optional secondary tracker - can be -1 or No tracker  |
 
-### Building
+# Building
 
-### Docker
+## Docker
 ```
 docker build -t deepsea-track .
 ```
 
-### Mac OSX Native
+## Mac OSX Native
 ```
 export APP_HOME=$PWD
 brew install boost
