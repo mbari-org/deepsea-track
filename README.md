@@ -24,9 +24,11 @@ https://www.mbari.org/cline-danelle-e/
 ---
 
 # Requirements
+- (optional) [Docker](www.docker.com)
+
+Alternatively, can be built natively for Mac with:
 - A compiler that support >= C++11
 - [CMake `>= 3.1`](https://cmake.org/download/)
-- (optional) [Docker](www.docker.com)
 - [HomeBrew](https://brew.sh/) for Mac OS install
 
 ---
@@ -37,8 +39,7 @@ https://www.mbari.org/cline-danelle-e/
  for the results, e.g.:
         
     ```bash
-    Users
-    ├── yogi
+  
     │   └── benthic
     │       ├── video.mp4
     │       ├── deepsea_class_map.json
@@ -47,24 +48,27 @@ https://www.mbari.org/cline-danelle-e/
   
     ```
 
+### Docker
+
+A docker image is avaiabe in dockerhub.com at https://hub.docker.com/u/mbari/deepsea-track
+
 * Run with 
 
 ```
-deepsea-track <video_name> <path to xml> <start frame num> <frame resize ratio> <stride(optional)>
+docker run -it --rm -v $PWD:/data mbari/deepsea-track <video_name> <path to xml> <start frame num> <frame resize ratio> <stride(optional)>
 ```
 
 e.g.
 
 ```
-deepsea-track  /Users/yogi/benthic/video.mp4  /Users/yogi/benthic_results 1 0.5
+docker run -it --rm -v $PWD:/data mbari/deepsea-track   /data/benthic/video.mp4  /data/benthic_results 1 0.5
 ```
 
 Frames and output will be rescaled by 0.5 in width and height in the above example.
 Output will look like:
       
     ```bash
-    Users
-    ├── yogi
+    
     │   └── benthic_results
     │       ├── f000001.json
     │       ├── f000002.json
@@ -119,17 +123,29 @@ e.g. this uses the MEDIANFLOW tracker and drops the second tracker:
   "min_event_frames": 3
 }
 ```
+e.g. this uses a combined MEDIANFLOW and KCF tracker:
+*deepsea_cfg.json*
+```
+{
+  "tracker1": 0,
+  "tracker2": 1,
+  "min_event_frames": 3
+}
+```
 
 | field   | description           |
 |----------|---------------|
 | tracker1 | The primary tracker - must be a valid id  |
 | tracker2 | Optional secondary tracker - can be -1 or No tracker  |
 
-### Installation
+### Building
 
-TODO: refactor third-party build into CMake
+### Docker
+```
+docker build -t deepsea-track .
+```
 
-## Mac OSX 
+### Mac OSX Native
 ```
 export APP_HOME=$PWD
 brew install boost
@@ -140,22 +156,3 @@ mkdir ./lib/xerces-c-3.2.2/build && cd ./lib/xerces-c-3.2.2/build
 cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=$APP_HOME/thirdparty/xerces-c -DCMAKE_BUILD_TYPE=Debug -Dmessage-loader=icu $APP_HOME/lib/xerces-c-3.2.2/
 make -j8 && make test && make install
 ```
-
-## Windows
-```
-TODO: add instructions here
-```
-
-## Linux Debian or Ubuntu
-```
-sudo apt-get update
-sudo apt-get install build-essential 
-...
-```
-
-## Docker
-```
-TODO: add docker build
-```
-
-
