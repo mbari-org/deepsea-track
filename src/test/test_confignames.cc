@@ -1,4 +1,4 @@
-#include "include/mbariviz/util/ConfigClassMap.h"
+#include "include/deepsea/util/ConfigClassMap.h"
 
 #include <iostream>
 #include <string>
@@ -8,7 +8,7 @@ using namespace avedac;
 
 int main()
 {
-    string filename = "/Users/dcline/Sandbox/avedac-track-opencv/deepsea_class_map.json";
+    string filename = "/Users/dcline/Sandbox/deepsea-track/deepsea_class_map.json";
     try {
         ConfigMaps cfg;
         initConfigMaps(filename, cfg);

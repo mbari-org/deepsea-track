@@ -23,9 +23,9 @@ int main( int argc, char** argv ) {
     // show help
     if (argc < 2) {
         cout <<
-             " Usage: tracker <video_name> <path to xml> <start frame num> <frame resize ratio>\n"
+             " Usage: test_visualobjecttracker <video_name> <path to xml> <start frame num> <frame resize ratio>\n"
              " examples:\n"
-             " voc_test $PWD/data/benthic/D0232_03HD_00-02-30.mov $PWD/data/benthic/ 1 0.5\n"
+             " test_visualobjecttracker $PWD/data/benthic/D0232_03HD_00-02-30.mov $PWD/data/benthic/ 1 0.5\n"
              << endl;
         return 0;
     }

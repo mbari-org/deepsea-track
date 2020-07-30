@@ -13,7 +13,7 @@ int main()
     ofstream c;
     c.open("config.json");
     c << "{" << endl;
-    c << "\"program\": \"avedac-deepsea\"," << endl;
+    c << "\"program\": \"test_visual_event\"," << endl;
     c << "\"tracker\": 0," << endl;
     c << "\"min_event_frames\": 3," << endl;
     c << "\"kalman_pnoise\": 0.1," << endl;

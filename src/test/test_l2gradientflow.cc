@@ -66,7 +66,7 @@ int main( int argc, char** argv ) {
     // show help
     if(argc<2){
         cout<<
-            " Usage: test_preprocess <video_name>>\n"
+            " Usage: test_l2gradientflow <video_name>>\n"
             " examples:\n"
             " test_l2gradientflow $PWD/data/benthic/D0232_03HD_00-02-30.mov $PWD/data/benthic/ \n"
             << endl;
