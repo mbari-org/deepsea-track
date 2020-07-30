@@ -1,5 +1,9 @@
 {
     "branch": "master",
+    "verifyConditions": {                                                                                                                             
+        "path": "semantic-release-docker",
+        "registryUrl": "docker.io"
+    },             
     "plugins": [
         "commitizen",
         "@semantic-release/commit-analyzer",
@@ -8,7 +12,7 @@
             "@semantic-release/changelog",
             {
                 "changelogFile": "CHANGELOG.md",
-                "changelogTitle": "# MBARI Deep Sea Track Changelog"
+                "changelogTitle": "# DeepSea Track Changelog"
             }
         ],
         [
@@ -18,6 +22,19 @@
                     "CHANGELOG.md"
                 ]
             }
-        ]
-    ]                                                                                                                                                
+        ],
+        "semantic-release-docker",                                                                                                                    
+        [                                                                                                                                             
+            "@semantic-release/exec",                                                                                                                 
+            {                                                                                                                                         
+                "prepareCmd": "docker build --build-arg DOCKER_GID=$$DOCKER_GID --build-arg DOCKER_UID=$DOCKER_UID -t mbari/deepsea-track ."
+            }                                                                                                                                         
+        ],                                                                                                                                            
+    ],                                                                                                                                                
+    "publish": [                                                                                                                                      
+        {                                                                                                                                             
+            "path": "semantic-release-docker",                                                                                                        
+            "name": "mbari/deepsea-track"
+         }                                                                                                                                             
+    ] 
 }    
