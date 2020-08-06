@@ -1,10 +1,11 @@
 image: node:12.15.0
 options:
   npm: true
+  docker: true
 pipelines:
   default:
         - step:
             script:
-              - npm install -g semantic-release@next @semantic-release/changelog@next @semantic-release/commit-analyzer@next @semantic-release/exec@next @semantic-release/git@next  @semantic-release/release-notes-generator@next commitizen
+              - npm install -g semantic-release@next @semantic-release/changelog@next @semantic-release/commit-analyzer@next @semantic-release/exec@next @semantic-release/git@next  @semantic-release/release-notes-generator@next  semantic-release-docker commitizen
               - semantic-release --debug
               - git push --mirror git@github.com:mbari-org/deepsea-track.git
