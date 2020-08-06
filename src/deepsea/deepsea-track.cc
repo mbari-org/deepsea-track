@@ -70,9 +70,10 @@ int main( int argc, char** argv ) {
     stringstream ssr;
     ssr << argv[4];
     ssr >> resize_percentage;
+    stringstream sss;
     if (argc >= 6) {
-        ssr << argv[5];
-        ssr >> stride;          ///! stride parameter
+        sss << argv[5];
+        sss >> stride;          ///! stride parameter
     }
 
     // Write the configuration.
