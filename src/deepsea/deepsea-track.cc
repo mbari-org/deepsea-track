@@ -75,6 +75,11 @@ int main( int argc, char** argv ) {
         ssr >> stride;          ///! stride parameter
     }
 
+    // Write the configuration.
+    cout << "Run configuration: starting frame (" << start_frame_num;
+    cout << "), resize % (" << resize_percentage << "), stride (" << stride;
+    cout << ")" << endl;
+
     ConfigMaps cfg_map;
     std::string filename = xml_path + "deepsea_class_map.json";
     try {
