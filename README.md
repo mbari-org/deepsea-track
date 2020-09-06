@@ -41,19 +41,17 @@ Alternatively, can be built natively for Mac with
 * Create a folder, e.g. "benthic" and add your video, class map, configuration file and folder
  to store the results, e.g.:
         
-    ```text
-  
-    │   └── benthic
-    │       ├── video.mp4
-    │       ├── deepsea_class_map.json
-    │       ├── f001000.json
-    │       ├── f001001.json
-    │       ├── f001002.json
-    │       ...
-    │       ├── f001010.json
-    │   └── benthic_results
-  
-    ```
+~~~
+│   └── benthic
+│       ├── video.mp4
+│       ├── deepsea_class_map.json
+│       ├── f001000.json
+│       ├── f001001.json
+│       ├── f001002.json
+│       ...
+│       ├── f001010.json
+│   └── benthic_results
+~~~
 
 ### Docker
 
