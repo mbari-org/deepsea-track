@@ -76,18 +76,16 @@ docker run -it --rm -v $PWD:/data mbari/deepsea-track  /data/benthic/video.mp4  
 
 Frames and output will be rescaled by 0.5 in width and height in the above example.
 Output will look like:
-      
-    ```
-    
-    │   └── benthic_results
-    │       ├── f000001.json
-    │       ├── f000002.json
-    │       ├── f000003.json
-    │       ├── f000004.json
-    │       ...    
-    │       ├── results.mp4
-  
-    ```
+           
+~~~ 
+│   └── benthic_results
+│       ├── f000001.json
+│       ├── f000002.json
+│       ├── f000003.json
+│       ├── f000004.json
+│       ...    
+│       ├── results.mp4    
+~~~
 
 TODO: add details on .json output
 
