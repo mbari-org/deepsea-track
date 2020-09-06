@@ -22,19 +22,21 @@
                     "CHANGELOG.md"
                 ]
             }
-        ],
-        "semantic-release-docker",                                                                                                                    
-        [                                                                                                                                             
-            "@semantic-release/exec",                                                                                                                 
-            {                                                                                                                                         
-                "prepareCmd": "docker build --build-arg DOCKER_GID=$$DOCKER_GID --build-arg DOCKER_UID=$DOCKER_UID -t mbari/deepsea-track ."
-            }                                                                                                                                         
-        ],                                                                                                                                            
-    ],                                                                                                                                                
-    "publish": [                                                                                                                                      
-        {                                                                                                                                             
-            "path": "semantic-release-docker",                                                                                                        
-            "name": "mbari/deepsea-track"
-         }                                                                                                                                             
-    ] 
+        ]
+#      ,
+#        "semantic-release-docker",
+#        [
+#            "@semantic-release/exec",
+#            {
+#                "prepareCmd": "docker build --build-arg DOCKER_GID=$$DOCKER_GID --build-arg DOCKER_UID=$DOCKER_UID -t mbari/deepsea-track ."
+#            }
+#        ],
+    ]
+#  ,
+#    "publish": [
+#        {
+#            "path": "semantic-release-docker",
+#            "name": "mbari/deepsea-track"
+#         }
+#    ]
 }    
