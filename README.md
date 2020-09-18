@@ -10,9 +10,6 @@
 It is designed to be used with output from object detection models in data formatted into XML files in [PASCAL VOC](http://host.robots.ox.ac.uk/pascal/VOC/) format but 
 can be used with any output generated in XML format. It generates unique *VisualEvent* track sequences for analysis in JSON format.
 
-*Upcoming*
-- Currently adding support for object detection inference using the [OpenVINO Toolkit](docs.openvinotoolkit.org). Stay tuned!
-
 [click image below to see example in YouTube]
 [![Example video output](https://img.youtube.com/vi/cMZ8vr0aAYI/maxresdefault.jpg)](https://youtu.be/cMZ8vr0aAYI)
 
@@ -52,6 +49,9 @@ Alternatively, can be built natively for Mac with
 │       ├── f001010.json
 │   └── benthic_results
 ~~~
+
+## Roadmap
+-  Add support for object detection inference using the [OpenVINO Toolkit](docs.openvinotoolkit.org)
 
 ### Docker
 
