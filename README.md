@@ -160,7 +160,13 @@ brew install boost
 brew install nlohmann-json
 curl -O https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.2.tar.gz
 tar -zxvf xerces-c-3.2.2.tar.gz
-mkdir ./lib/xerces-c-3.2.2/build && cd ./lib/xerces-c-3.2.2/build
-cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=$APP_HOME/thirdparty/xerces-c -DCMAKE_BUILD_TYPE=Debug -Dmessage-loader=icu $APP_HOME/lib/xerces-c-3.2.2/
-make -j8 && make test && make install
+mkdir ./lib/xerces-c-3.2.2/build && \
+    cd ./lib/xerces-c-3.2.2/build && \
+    cmake -G "Unix Makefiles" \-DCMAKE_INSTALL_PREFIX=$APP_HOME/thirdparty/xerces-c -DCMAKE_BUILD_TYPE=Debug -Dmessage-loader=icu $APP_HOME/lib/xerces-c-3.2.2/
+    make -j8 && make test && make install
+
+git clone --recursive https://github.com/Microsoft/onnxruntime && \
+    mkdir ./onnxruntime/build && cd ./onnxruntime/build && \
+    ../build.sh --config RelWithDebInfo --build_shared_lib --parallel --build_wheel && \
+    cd build/Linux/RelWithDebInfo && make install lib
 ```

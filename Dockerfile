@@ -28,10 +28,8 @@ RUN curl -L https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.1
     cmake --version
 
 
-# ================================================================
-# Download OpenCV and build for source using CMake.
+# Download and build OpenCV with contrib modules
 # https://linuxize.com/post/how-to-install-opencv-on-ubuntu-18-04/
-# ================================================================
 # Clone repositories
 RUN cd /opt/ && \
     git clone https://github.com/opencv/opencv.git /opt/opencv && \
@@ -53,9 +51,9 @@ RUN cd /opt/opencv && \
     -D OPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib/modules \
     /opt/opencv/ && \
     make -j4 && \
-    make install    
+    make install
 
-# Install Xerces-C
+# Download and build Xerces-C for parsing XML
 RUN cd /opt/ && \
     curl -L https://downloads.apache.org//xerces/c/3/sources/xerces-c-3.2.3.tar.gz \
     --output /opt/xerces-c-3.2.3.tar.gz && \
@@ -66,10 +64,13 @@ RUN cd /opt/ && \
     make install 
 RUN apt install -y libxerces-c3.2    
 
-# ================================================================
+# Download and build onnxruntime for executing ONNX models
+git clone --recursive https://github.com/Microsoft/onnxruntime && \
+    mkdir ./onnxruntime/build && cd ./onnxruntime/build && \
+    ./build.sh --config RelWithDebInfo --build_shared_lib --parallel  \
+    cd build/Linux/RelWithDebInfo && make install lib
+
 # Download and build the deepsea-track repository
-# ================================================================
-# Get the deepsea-track directory
 COPY . /home/deepsea-track
 
 RUN cd /home/deepsea-track && \
