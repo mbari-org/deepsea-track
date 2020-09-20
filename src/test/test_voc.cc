@@ -17,9 +17,6 @@
  * David and Lucile Packard Foundation
  */
 
-//#ifndef PREPROCESS_C_DEFINED
-//#define PREPROCESS_C_DEFINED
-
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/videoio.hpp>
@@ -112,4 +109,3 @@ int main( int argc, char** argv ) {
         vocs.clear();
     }
 }
-//#endif

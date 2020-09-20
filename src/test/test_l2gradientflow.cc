@@ -104,4 +104,3 @@ int main( int argc, char** argv ) {
         if(waitKey(1)==27)break;
     }
 }
-//#endif
