@@ -67,8 +67,10 @@ RUN apt install -y libxerces-c3.2
 # Download and build onnxruntime for executing ONNX models
 git clone --recursive https://github.com/Microsoft/onnxruntime && \
     mkdir ./onnxruntime/build && cd ./onnxruntime/build && \
-    ./build.sh --config RelWithDebInfo --build_shared_lib --parallel  \
-    cd build/Linux/RelWithDebInfo && make install lib
+    ./build.sh --config Release --skip_submodule_sync --build_shared_lib --parallel && \
+    cd Linux/Release && make install lib
+
+# for CUDA build: --config Release --skip_submodule_sync  --parallel --build_shared_lib --use_cuda --cuda_version=10.2 --cuda_home=/usr/local/cuda-10.2 --cudnn_home=/usr/local/cuda-10.2
 
 # Download and build the deepsea-track repository
 COPY . /home/deepsea-track

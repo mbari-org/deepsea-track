@@ -168,5 +168,5 @@ mkdir ./lib/xerces-c-3.2.2/build && \
 git clone --recursive https://github.com/Microsoft/onnxruntime && \
     mkdir ./onnxruntime/build && cd ./onnxruntime/build && \
     ../build.sh --config RelWithDebInfo --build_shared_lib --parallel --build_wheel && \
-    cd build/Linux/RelWithDebInfo && make install lib
+    cd ./Linux/RelWithDebInfo && make install lib
 ```
