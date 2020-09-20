@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+## [1.0.2](http://bitbucket.org/mbari/deepsea-track/compare/v1.0.1...v1.0.2) (2020-09-20)
+
+
+### Bug Fixes
+
+* added in missing closure ([3794612](http://bitbucket.org/mbari/deepsea-track/commits/3794612b4d87878634c8be9f2c6499b9698aee41))
+
 ## [1.0.1](http://bitbucket.org/mbari/deepsea-track/compare/v1.0.0...v1.0.1) (2020-09-06)
 
 
