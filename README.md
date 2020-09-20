@@ -15,7 +15,7 @@ can be used with any output generated in XML format. It generates unique *Visual
 
 # Questions?
 
-If you have any questions, or are interested in helping with the development, please contact me at: dcline@mbari.org
+If you have any questions or are interested in contributing, please contact me at dcline@mbari.org.
 
 *Danelle Cline*
 https://www.mbari.org/cline-danelle-e/
