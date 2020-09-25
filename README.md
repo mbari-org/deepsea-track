@@ -50,14 +50,11 @@ Alternatively, can be built natively for Mac with
 │   └── benthic_results
 ~~~
 
-## Roadmap
--  Add support for object detection inference using the [OpenVINO Toolkit](docs.openvinotoolkit.org)
+### Run in Docker
 
-### Docker
+The easiest way to run it is in a docker image. See https://hub.docker.com/u/mbari/deepsea-track for available releases.
 
-A docker image is available in dockerhub.com at https://hub.docker.com/u/mbari/deepsea-track
-
-Run with 
+For example, to run removing following execution:
 
 - path to video/xml - both must be in the same directory
 - path to store results
@@ -75,7 +72,7 @@ docker run -it --rm -v $PWD:/data mbari/deepsea-track  /data/benthic/video.mp4  
 ```
 
 Frames and output will be rescaled by 0.5 in width and height in the above example.
-Output will look like:
+The output will look like:
            
 ~~~ 
 │   └── benthic_results
@@ -87,7 +84,66 @@ Output will look like:
 │       ├── results.mp4    
 ~~~
 
-TODO: add details on .json output
+---
+
+## JSON output schema
+
+Data is output per each frame with all events tracked per the following schema:
+
+```
+{
+   "$schema": "http://json-schema.org/draft-04/schema#",
+   "title": "deepsea-track",
+   "description": "a collection of visual events",
+   "type": "object",
+	
+   "properties": {
+	
+      "uuid": {
+         "description": "The unique identifier for this VisualEvent",
+         "type": "string"
+      },
+		
+      "bounding_box": {
+         "description": "Bounding Box",
+         "type": "object",
+         "properties": {
+            "x": "top left x coordinate",
+            "y": "top left y coordinate",
+            "width": "The width in pixels from top left",
+            "height": "The height in pixels from top left"
+        }        
+      },
+		
+      "occlusion": {
+         "description": "Number of occluded pixels - an approximation based on intersection over union",
+         "type": "integer"
+      },
+
+      "class_name": {
+         "description": "The unique class name ",
+         "type": "string"
+      },
+
+      "class_index": {
+         "description": "The unique class index",
+         "type": "integer"
+      },
+
+      "confidence": {
+         "description": "Confidence score for a given class_name/index between 0-100",
+         "type": "integer"
+      },
+
+      "surprise": {
+         "description": "Surprise factor 0-TBD",
+         "type": "integer"
+      }, 
+   },
+	
+   "required": ["uuid", "bounding_box", "occlusion",  "class_name", "class_index", "confidence", "surprise"]
+}
+```
 
 ---
 
@@ -170,3 +226,6 @@ git clone --recursive https://github.com/Microsoft/onnxruntime && \
     ../build.sh --config RelWithDebInfo --build_shared_lib --parallel --build_wheel && \
     cd ./Linux/RelWithDebInfo && make install lib
 ```
+
+## Roadmap
+-  Add support for object detection inference using the [OpenVINO Toolkit](docs.openvinotoolkit.org)
