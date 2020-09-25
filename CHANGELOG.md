@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+## [1.0.3](http://bitbucket.org/mbari/deepsea-track/compare/v1.0.2...v1.0.3) (2020-09-25)
+
+
+### Bug Fixes
+
+* added missing docker command ([1657f33](http://bitbucket.org/mbari/deepsea-track/commits/1657f33ceea9f9394c87d6a6d2bea63e79104ca7))
+
 ## [1.0.2](http://bitbucket.org/mbari/deepsea-track/compare/v1.0.1...v1.0.2) (2020-09-20)
 
 
