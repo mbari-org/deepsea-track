@@ -143,7 +143,7 @@ namespace deepsea {
         /// \param[in] j JSON object to load from
         /// \param[in/out] p event_object to save to
         static void from_json(const json& j, EventObject& p){
-            p.bbox_tracker_ = Utils::json2rect(j.at("bounding_box1"));
+            p.bbox_tracker_ = Utils::json2rect(j.at("bounding_box"));
             string uuid_str;
             float confidence, surprise;
             j.at("uuid").get_to(uuid_str);
