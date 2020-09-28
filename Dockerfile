@@ -6,8 +6,6 @@ FROM zouzias/boost:1.73.0
 
 MAINTAINER Peyton Lee <plee@mbari.org>, Danelle Cline <dcine@mbari.org>
 
-RUN chmod 1777 /tmp
-
 # Get dependencies
 RUN apt-get update --fix-missing && \
     apt-get install -y build-essential cmake git pkg-config libgtk-3-dev \
@@ -27,16 +25,16 @@ RUN curl -L https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.1
     /opt/cmake/bin/cmake --version && \
     cmake --version
 
+WORKDIR /tmp/build
 
 # Download and build OpenCV with contrib modules
 # https://linuxize.com/post/how-to-install-opencv-on-ubuntu-18-04/
 # Clone repositories
-RUN cd /opt/ && \
-    git clone https://github.com/opencv/opencv.git /opt/opencv && \
-    git clone https://github.com/opencv/opencv_contrib.git /opt/opencv_contrib
+RUN git clone https://github.com/opencv/opencv.git && \
+    git clone https://github.com/opencv/opencv_contrib.git
 
 # Create the temporary build directory and build using CMake.
-RUN cd /opt/opencv && \
+RUN cd /tmp/build/opencv && \
     mkdir build && \
     cd build && \
     cmake -D CMAKE_BUILD_TYPE=RELEASE \
@@ -48,41 +46,38 @@ RUN cd /opt/opencv && \
     -D BUILD_DOCS=OFF \
     -D BUILD_PERF_TESTS=OFF \
     -D BUILD_TESTS=OFF \
-    -D OPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib/modules \
-    /opt/opencv/ && \
-    make -j4 && \
-    make install
+    -D OPENCV_EXTRA_MODULES_PATH=/tmp/build/opencv_contrib/modules \
+    /tmp/build/opencv/ && \
+    make -j8 && make install
 
 # Download and build Xerces-C for parsing XML
-RUN cd /opt/ && \
-    curl -L https://downloads.apache.org//xerces/c/3/sources/xerces-c-3.2.3.tar.gz \
+RUN curl -L https://downloads.apache.org//xerces/c/3/sources/xerces-c-3.2.3.tar.gz \
     --output /opt/xerces-c-3.2.3.tar.gz && \
     tar -xvzf xerces-c-3.2.3.tar.gz && \
     cd xerces-c-3.2.3 && \
     cmake ./ && \
-    make && \
-    make install 
-RUN apt install -y libxerces-c3.2    
+    make -j8 &&  make install
 
 # Download and build onnxruntime for executing ONNX models
 RUN git clone --recursive https://github.com/Microsoft/onnxruntime && \
     mkdir ./onnxruntime/build && cd ./onnxruntime/build && \
     ./build.sh --config Release --skip_submodule_sync --build_shared_lib --parallel && \
     cd Linux/Release && make install lib
-
 # for CUDA build: --config Release --skip_submodule_sync  --parallel --build_shared_lib --use_cuda --cuda_version=10.2 --cuda_home=/usr/local/cuda-10.2 --cudnn_home=/usr/local/cuda-10.2
 
+RUN curl -L https://github.com/nlohmann/json/archive/v3.9.1.tar.gz && \
+    tar -xvzf v3.9.1.tar.gz && cd v3.9.1 && \
+    make -j8 && make install
+
+# Clean-up
+RUN rm -rf /tmp/build
+
 # Download and build the deepsea-track repository
-COPY . /home/deepsea-track
+COPY . /app/deepsea-track
 
-RUN cd /home/deepsea-track && \
-    mkdir thirdparty && \
-    git clone https://github.com/nlohmann/json ./thirdparty
-
-RUN cd /home/deepsea-track/ && \
+RUN cd /app/deepsea-track/ && \
     /opt/cmake/bin/cmake --version && \
     /opt/cmake/bin/cmake ./ && \
     make
 
-CMD /home/deepsea-track/deepsea-track
-
+CMD /app/deepsea-track/deepsea-track

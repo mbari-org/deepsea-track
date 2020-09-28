@@ -28,7 +28,7 @@ https://www.mbari.org/cline-danelle-e/
 Alternatively, can be built natively for Mac with
 
 - A compiler that support >= C++11
-- [CMake `>= 3.1`](https://cmake.org/download/)
+- [CMake `>= 3.15`](https://cmake.org/download/)
 - [HomeBrew](https://brew.sh/) for Mac OS install
 
 ---
@@ -54,13 +54,16 @@ Alternatively, can be built natively for Mac with
 
 The easiest way to run it is in a docker image. See https://hub.docker.com/u/mbari/deepsea-track for available releases.
 
-For example, to run removing following execution:
+For example:
 
 - path to video/xml - both must be in the same directory
 - path to store results
 - start frame - 6-digit frame prefix to start, by default will process until the end of of the xml sequence.
 - frame resize ratio ratio between 0-1.0 to resize the input video. Smaller resize ratio will process faster.
 - stride(optional) - amount to stride between frames. Default is 1. Larger stride will process faster.
+
+-it = run interactively
+--rm = remove after execution
 ```
 docker run -it --rm -v $PWD:/data mbari/deepsea-track <path to video/xml> <path to store results> <start frame num> <frame resize ratio> <stride(optional)>
 ```
@@ -210,20 +213,20 @@ docker build -t deepsea-track .
 ```
 
 ## Mac OSX Native
+Note that the CMake files in this project require version 3.15 or higher
 ```
-export APP_HOME=$PWD
 brew install boost
-brew install nlohmann-json
-curl -O https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.2.tar.gz
-tar -zxvf xerces-c-3.2.2.tar.gz
-mkdir ./lib/xerces-c-3.2.2/build && \
-    cd ./lib/xerces-c-3.2.2/build && \
-    cmake -G "Unix Makefiles" \-DCMAKE_INSTALL_PREFIX=$APP_HOME/thirdparty/xerces-c -DCMAKE_BUILD_TYPE=Debug -Dmessage-loader=icu $APP_HOME/lib/xerces-c-3.2.2/
-    make -j8 && make test && make install
-
+brew tap nlohmann/json
+brew install nlohmann/json
+cd thirdparty && 
+curl -O https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.3.tar.gz &&
+tar -zxvf xerces-c-3.2.3.tar.gz &&
+cd xerces-c-3.2.3 && \
+    ./configure CFLAGS="-arch x86_64" CXXFLAGS="-arch x86_64" &&
+    make -j8 && make install
+cd ../../thirdparty &&
 git clone --recursive https://github.com/Microsoft/onnxruntime && \
-    mkdir ./onnxruntime/build && cd ./onnxruntime/build && \
-    ../build.sh --config RelWithDebInfo --build_shared_lib --parallel --build_wheel && \
+    cd ./onnxruntime && build.sh --config RelWithDebInfo --build_shared_lib --parallel && \
     cd ./Linux/RelWithDebInfo && make install lib
 ```
 
