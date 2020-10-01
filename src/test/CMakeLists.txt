@@ -4,10 +4,12 @@ include_directories( ${Boost_INCLUDE_DIR} )
 find_package(XercesC 3.2.3 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
-
+include_directories(/usr/local/include/)
 
 add_executable(test_xercesc test_xercesc.cc)
 target_link_libraries(test_xercesc ${XercesC_LIBRARIES})
+add_executable(test_detmodel_load test_detmodel_load.cc)
+target_link_libraries(test_detmodel_load ${OpenCV_LIBS} onnxruntime)
 #add_executable(test_confignames util/configclassmap.cc)
 #add_executable(test_detmodel_load test_detmodel_load.cc)
 #add_executable(test_config test_config.cc util/config.cc)
