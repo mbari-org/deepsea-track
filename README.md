@@ -73,7 +73,7 @@ e.g.
 - process video file /data/benthic/video.mp4
 - output results to mapped /data mount in the directory /data/benthic
 - start at frame 1
-- <no stride specified>
+- *no stride specified*
 ```
 docker run -it --rm -v $PWD:/data mbari/deepsea-track  /data/benthic/video.mp4  /data/benthic 1 512 512
 ```
