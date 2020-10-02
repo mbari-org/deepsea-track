@@ -56,22 +56,26 @@ The easiest way to run it is in a docker image. See https://hub.docker.com/u/mba
 
 For example:
 
-- path to video/xml - both must be in the same directory
-- path to store results
+- absolute path to video/xml - both must be in the same directory
+- absolute path to store the results
 - start frame - 6-digit frame prefix to start, by default will process until the end of of the xml sequence.
-- frame resize ratio ratio between 0-1.0 to resize the input video. Smaller resize ratio will process faster.
+- frame width to resize the input video. Smaller width will process faster.
+- frame height to resize the input video. Smaller height will process faster.
 - stride(optional) - amount to stride between frames. Default is 1. Larger stride will process faster.
 
 -it = run interactively
 --rm = remove after execution
 ```
-docker run -it --rm -v $PWD:/data mbari/deepsea-track <path to video/xml> <path to store results> <start frame num> <frame resize ratio> <stride(optional)>
+docker run -it --rm -v $PWD:/data mbari/deepsea-track <path to video/xml> <path to store results> <start frame num> <image width resize> <image height resize> <stride(optional)>
 ```
 
 e.g.
-
+- process video file /data/benthic/video.mp4
+- output results to mapped /data mount in the directory /data/benthic
+- start at frame 1
+- <no stride specified>
 ```
-docker run -it --rm -v $PWD:/data mbari/deepsea-track  /data/benthic/video.mp4  /data/benthic_results 1 0.5
+docker run -it --rm -v $PWD:/data mbari/deepsea-track  /data/benthic/video.mp4  /data/benthic 1 512 512
 ```
 
 Frames and output will be rescaled by 0.5 in width and height in the above example.

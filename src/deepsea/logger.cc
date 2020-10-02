@@ -10,9 +10,8 @@ using namespace nlohmann;
 namespace deepsea {
 
 // ######################################################################
-    Logger::Logger(const Config &cfg, float resize_per, unsigned int start_frame_num, string out_dir)
+    Logger::Logger(const Config &cfg, unsigned int start_frame_num, string out_dir)
             : cfg_(cfg),
-              resize_per_(resize_per),
               start_frame_num_(start_frame_num),
               out_dir_(out_dir){
     }
@@ -23,7 +22,8 @@ namespace deepsea {
     }
 
 // ######################################################################
-    void Logger::save(list<VisualEvent *> events, unsigned int frame_num) {
+    void Logger::save(list<VisualEvent *> events, unsigned int frame_num,
+            float resize_factor_width, float resize_factor_height) {
 
         list<VisualEvent *>::iterator itve;
         ofstream out_file(out_dir_ + cv::format("f%06d.json", frame_num));
@@ -31,12 +31,12 @@ namespace deepsea {
 
         for (itve = events.begin(); itve != events.end(); ++itve) {
 
-            // only log events that are validm
+            // only log events that are valid
             if ((*itve)->getState() == VisualEvent::State::VALID) {
                 uuids::uuid id = (*itve)->getUUID();
                 EventObject vo = (*itve)->getLatestObject();
                 json voj;
-                EventObject::to_json(voj, vo);
+                EventObject::to_json(voj, vo, resize_factor_width, resize_factor_height);
                 j.push_back({"visualevent", voj});
 
             }

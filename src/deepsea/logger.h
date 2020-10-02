@@ -35,22 +35,24 @@ namespace deepsea {
 
         /// \brief Constructor
         /// \param cfg system configuration
-        /// \param resize_per  percent to resize bounding boxes
         /// \param start_frame_num  starting frame to log
         /// \param out_dir output directory to log files to
-        Logger(const Config &cfg, float resize_per, unsigned int start_frame_num, string out_dir);
+        Logger(const Config &cfg, unsigned int start_frame_num, string out_dir);
 
         virtual ~Logger();
 
         /// Log all the \see visual_event VisualEvents to JSON files
         /// \param events  list of events
         /// \param frame_num frame number to associate to this collection of event
-        void save(list<VisualEvent *> events, unsigned int frame_num);
+        /// \param resize_factor_width factor between 0-1 to rescale width
+        /// \param resize_factor_height factor between 0-1 to rescale height
+        void save(list<VisualEvent *> events, unsigned int frame_num,
+                float resize_factor_width=1.,
+                float resize_factor_height=1.);
 
     private:
 
         Config cfg_;                    ///! system configuration
-        float resize_per_;              ///! percent images are resized to; used to normalize back to raw video size
         unsigned int start_frame_num_;  ///! starting frame; used only during startup
         string out_dir_;                ///! output directory to log all files to
      };

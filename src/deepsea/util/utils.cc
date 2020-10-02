@@ -13,12 +13,13 @@ namespace deepsea {
         return iou;
     }
 
-    Rect2d Utils::rescale(float resize_percentage, Rect2d &bbox) {
-        bbox.x = int(bbox.x * 1. / resize_percentage);
-        bbox.y = int(bbox.y * 1. / resize_percentage);
-        bbox.width = int(bbox.width * 1. / resize_percentage);
-        bbox.height = int(bbox.height * 1. / resize_percentage);
-        return bbox;
+    Rect2d Utils::rescale(float resize_factor_width, float resize_factor_height, const Rect2d &bbox) {
+        Rect2d b;
+        b.x = int(bbox.x * 1. / resize_factor_width);
+        b.y = int(bbox.y * 1. / resize_factor_height);
+        b.width = int(bbox.width * 1. / resize_factor_width);
+        b.height = int(bbox.height * 1. / resize_factor_height);
+        return b;
     }
 
 

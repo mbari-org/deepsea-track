@@ -123,9 +123,12 @@ namespace deepsea {
         /// \brief utility method to convert from JSON to event_object
         /// \param[in/out] j JSON object to load to
         /// \param[in] p event_object to save from
-        static void to_json(json& j, const EventObject& p) {
+        /// \param resize_factor_width factor between 0-1 to rescale width
+        /// \param resize_factor_height factor between 0-1 to rescale height
+        static void to_json(json& j, const EventObject& p, float resize_factor_width, float resize_factor_height) {
             // only need to save tracker box
-            json jbox_t = Utils::rect2json(p.getBboxTracker());
+            Rect2d box = Utils::rescale(resize_factor_width, resize_factor_height, p.getBboxTracker());
+            json jbox_t = Utils::rect2json(box);
 
             j = json{
                 {"uuid", boost::uuids::to_string(p.uuid_)},

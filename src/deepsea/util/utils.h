@@ -45,11 +45,12 @@ namespace deepsea {
         /// \return intersection over union
         static double iou(const Rect_<float> bb1, const Rect_<float> bb2);
 
-        /// \brief rescales bounding box based on given percentage
-        /// \param resize_percentage percentage between 1-100 to rescale
+        /// \brief rescales bounding box
+        /// \param resize_factor_width factor between 0-1 to rescale width
+        /// \param resize_factor_height factor between 0-1 to rescale height
         /// \param bbox
-        /// \return
-        static Rect2d rescale(float resize_percentage, Rect2d &bbox);
+        /// \return scaled bounding box
+        static Rect2d rescale(float resize_factor_width, float resize_factor_height, const Rect2d &bbox);
 
         /// \brief convert bounding box rectangle to json
         /// \param[in] box to convert

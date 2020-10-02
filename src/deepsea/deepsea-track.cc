@@ -41,9 +41,9 @@ int main( int argc, char** argv ) {
     // show help
     if (argc < 2) {
         cout <<
-             " Usage: deepsea-track <path to video> <path to xml> <start frame num> <frame resize ratio> <stride(optional)>\n"
+             " Usage: deepsea-track <path to video> <path to xml> <start frame num> <frame resize width> < frame resize height> <stride(optional)>\n"
              " examples:\n"
-             " deepsea-track $PWD/data/benthic/D0232_03HD_00-02-30.mov $PWD/data/benthic/ 1 0.5\n"
+             " deepsea-track $PWD/data/benthic/D0232_03HD_00-02-30.mov $PWD/data/benthic/ 1 512 512 \n"
              << endl;
         return -1;
     }
@@ -61,24 +61,27 @@ int main( int argc, char** argv ) {
     XercesDOMParser *parser = new XercesDOMParser;
     Mat frame, frame_enhanced, frame_resized;
     unsigned int start_frame_num;
-    float resize_percentage;
+    int resize_height, resize_width;
     string video = argv[1];
     string xml_path = argv[2];
     stringstream ssf;           ///! starting frame
     ssf << argv[3];
     ssf >> start_frame_num;     ///! percent to resize video
-    stringstream ssr;
-    ssr << argv[4];
-    ssr >> resize_percentage;
+    stringstream ssw;
+    ssw << argv[4];
+    ssw >> resize_width;
+    stringstream ssh;
+    ssh << argv[4];
+    ssh >> resize_height;
     stringstream sss;
-    if (argc >= 6) {
-        sss << argv[5];
+    if (argc >= 8) {
+        sss << argv[7];
         sss >> stride;          ///! stride parameter
     }
 
     // Write the configuration.
     cout << "Run configuration: starting frame (" << start_frame_num;
-    cout << "), resize % (" << resize_percentage << "), stride (" << stride;
+    cout << "), resize (" << resize_width <<  "x" << resize_height << "), stride (" << stride;
     cout << ")" << endl;
 
     ConfigMaps cfg_map;
@@ -100,6 +103,8 @@ int main( int argc, char** argv ) {
     int width  = cap.get(CAP_PROP_FRAME_WIDTH);
     int height = cap.get(CAP_PROP_FRAME_HEIGHT);
     float fps = cap.get(CAP_PROP_FPS);
+    float resize_factor_width = float(resize_width) / float(width);
+    float resize_factor_height = float(resize_height) / float(height);
     if (start_frame_num > 1) {
         cap.set(CAP_PROP_POS_FRAMES, start_frame_num);
         frame_num = start_frame_num;
@@ -108,9 +113,9 @@ int main( int argc, char** argv ) {
     VideoWriter out(xml_path + "results.mp4", VideoWriter::fourcc('H','2','6','4'),
             fps, Size(width,height));
 
-    Size scaled_size(Size(    (int) width*resize_percentage, (int) height * resize_percentage));
+    Size scaled_size(Size(resize_width, resize_height));
     Preprocess pre(scaled_size, 3, video);
-    Logger log(cfg, resize_percentage, start_frame_num, xml_path);
+    Logger log(cfg, start_frame_num, xml_path);
     VisualEventManager manager(cfg, cfg_map);
 
     cout << "Starting " << cfg.getProgram() << " , press ESC to quit" << endl;
@@ -132,7 +137,7 @@ int main( int argc, char** argv ) {
         }
 
         double timer = (double)getTickCount();
-        resize(frame, frame_resized, Size(), resize_percentage, resize_percentage);
+        resize(frame, frame_resized, Size(), resize_factor_width, resize_factor_height);
 
         // enhance
         frame_enhanced = pre.update(frame_resized);
@@ -142,10 +147,10 @@ int main( int argc, char** argv ) {
         list<EventObject> vobs;
         for (itvoc = vocs.begin(); itvoc != vocs.end(); ++itvoc) {
             Rect2d  r = (*itvoc).getBox();
-            r.x = int(r.x * resize_percentage);
-            r.y = int(r.y * resize_percentage);
-            r.width = int(r.width * resize_percentage);
-            r.height = int(r.height * resize_percentage);
+            r.x = int(r.x * resize_factor_width);
+            r.y = int(r.y * resize_factor_height);
+            r.width = int(r.width * resize_factor_width);
+            r.height = int(r.height * resize_factor_height);
             (*itvoc).setBox(r);
             EventObject o((*itvoc), 0, frame_num);
             vobs.push_back(o);
@@ -159,7 +164,7 @@ int main( int argc, char** argv ) {
         list<VisualEvent *> events = manager.getEvents(frame_num);
 
         // log to json
-        log.save(events, frame_num);
+        log.save(events, frame_num, resize_factor_width, resize_factor_height);
 
         if (cfg.display()) {
             list<VisualEvent *>::iterator itve;
@@ -174,7 +179,7 @@ int main( int argc, char** argv ) {
 
                 // rescale boxes in case tracking on reduced frame size
                 Rect2d bbox = evt_obj.getBboxTracker();
-                Rect2d bbox_tracker = Utils::rescale(resize_percentage, bbox);
+                Rect2d bbox_tracker = Utils::rescale(resize_factor_width, resize_factor_height, bbox);
 
                 // descriptive information for the frame overlay
                 uuids::uuid id = (*itve)->getUUID();

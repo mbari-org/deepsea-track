@@ -18,22 +18,15 @@
  */
 
 #include <opencv2/opencv.hpp>
-#include <core/session/experimental_onnxruntime_cxx_api.h>
+#include <onnxruntime/core/session/experimental_onnxruntime_cxx_api.h>
 #include <array>
 #include <cmath>
-#include <algorithm>
 #include <memory>
 #include <vector>
-#include <iostream>
-#include <fstream>
+#include <iostream>=
 #include <sstream>
 #include <atomic>
 #include <stdlib.h>
-#include <algorithm>  // std::generate
-#include <assert.h>
-#include <iostream>
-#include <sstream>
-#include <vector> // std::vector
 
 // pretty prints a shape dimension vector
 std::string print_shape(const std::vector<int64_t>& v) {
@@ -176,7 +169,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    // generate random numbers in the range [0, 255]
     std::vector<Ort::Value> input_tensors;
     input_tensors.push_back(Ort::Experimental::Value::CreateTensor<float>(input_tensor_values.data(),
                                                                           input_tensor_values.size(), input_shape));
