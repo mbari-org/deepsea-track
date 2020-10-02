@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+# [1.1.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.0.3...v1.1.0) (2020-10-01)
+
+
+### Features
+
+* initial check-in ([c3370d3](http://bitbucket.org/mbari/deepsea-track/commits/c3370d399d48a60fcb2ce4337af2531b00b72c0a))
+
 ## [1.0.3](http://bitbucket.org/mbari/deepsea-track/compare/v1.0.2...v1.0.3) (2020-09-25)
 
 
