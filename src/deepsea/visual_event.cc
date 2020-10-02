@@ -177,8 +177,8 @@ namespace deepsea {
 
 // ######################################################################
     bool VisualEvent::boundsCheck(const Size &size, const Rect2d &bbox) {
-        int width_pad = 0.10 * bbox.width;
-        int height_pad = 0.10 * bbox.height;
+        int width_pad = 0.01 * bbox.width;
+        int height_pad = 0.01 * bbox.height;
         if (bbox.x <= width_pad ||
             bbox.y <= height_pad ||
             bbox.x + bbox.width > size.width - width_pad ||
