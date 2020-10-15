@@ -1,5 +1,17 @@
 # DeepSea Track Changelog
 
+# [1.2.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.1.0...v1.2.0) (2020-10-02)
+
+
+### Features
+
+* width/height scaling and rescale output to same dimension as input ([2425b88](http://bitbucket.org/mbari/deepsea-track/commits/2425b88c40b77d80305a9eacf030d1a4265fe72e))
+
+
+### Performance Improvements
+
+* change pad check from 10% to 1% ([ead483c](http://bitbucket.org/mbari/deepsea-track/commits/ead483c86a4dfaf1ff76cbb3fbd18229c2c1e3be))
+
 # [1.1.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.0.3...v1.1.0) (2020-10-01)
 
 
