@@ -163,7 +163,7 @@ This is human-readable descriptions and colors to associate to each class, e.g.
     "items":[
       {
         "id": 1,
-        "map": [{"name": "PENIAGONE_VITRAE", "description": "Peniagone vitrae", "color": "89  233 206"}]
+        "map": [{"name": "PENIAGONE_VITRAE", "description": "Peniagone vitrea", "color": "89  233 206"}]
       },
       {
         "id": 2,
