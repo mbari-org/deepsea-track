@@ -52,17 +52,17 @@ RUN cd /tmp/build/opencv && \
 
 # Download and build Xerces-C for parsing XML
 RUN curl -L https://downloads.apache.org//xerces/c/3/sources/xerces-c-3.2.3.tar.gz \
-    --output /opt/xerces-c-3.2.3.tar.gz && \
-    tar -xvzf xerces-c-3.2.3.tar.gz && \
-    cd xerces-c-3.2.3 && \
+    --output xerces.tar.gz && \
+    tar -xvzf xerces.tar.gz && \
+    cd xerces && \
     cmake ./ && \
     make -j8 &&  make install
 
 # Download and build onnxruntime for executing ONNX models
-RUN git clone --recursive https://github.com/Microsoft/onnxruntime && \
-    mkdir ./onnxruntime/build && cd ./onnxruntime/build && \
-    ./build.sh --config Release --skip_submodule_sync --build_shared_lib --parallel && \
-    cd Linux/Release && make install lib
+#RUN git clone --recursive https://github.com/Microsoft/onnxruntime && \
+#    mkdir ./onnxruntime/build && cd ./onnxruntime/build && \
+#    ./build.sh --config Release --skip_submodule_sync --build_shared_lib --parallel && \
+# cd Linux/Release && make install lib
 # for CUDA build: --config Release --skip_submodule_sync  --parallel --build_shared_lib --use_cuda --cuda_version=10.2 --cuda_home=/usr/local/cuda-10.2 --cudnn_home=/usr/local/cuda-10.2
 
 RUN curl -L https://github.com/nlohmann/json/archive/v3.9.1.tar.gz && \
