@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+## [1.2.1](http://bitbucket.org/mbari/deepsea-track/compare/v1.2.0...v1.2.1) (2020-10-15)
+
+
+### Bug Fixes
+
+* correct xerces install and disable onnx for now ([baf5ec3](http://bitbucket.org/mbari/deepsea-track/commits/baf5ec3e38881c02f379e172c34775bb551097dd))
+
 # [1.2.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.1.0...v1.2.0) (2020-10-02)
 
 
