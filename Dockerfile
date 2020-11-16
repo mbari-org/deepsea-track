@@ -58,13 +58,6 @@ RUN curl -L https://downloads.apache.org//xerces/c/3/sources/xerces-c-3.2.3.tar.
     cmake ./ && \
     make -j8 &&  make install
 
-# Download and build onnxruntime for executing ONNX models
-#RUN git clone --recursive https://github.com/Microsoft/onnxruntime && \
-#    mkdir ./onnxruntime/build && cd ./onnxruntime/build && \
-#    ./build.sh --config Release --skip_submodule_sync --build_shared_lib --parallel && \
-# cd Linux/Release && make install lib
-# for CUDA build: --config Release --skip_submodule_sync  --parallel --build_shared_lib --use_cuda --cuda_version=10.2 --cuda_home=/usr/local/cuda-10.2 --cudnn_home=/usr/local/cuda-10.2
-
 RUN curl -L https://github.com/nlohmann/json/archive/v3.9.1.tar.gz && \
     tar -xvzf v3.9.1.tar.gz && cd v3.9.1 && \
     make -j8 && make install
@@ -72,7 +65,7 @@ RUN curl -L https://github.com/nlohmann/json/archive/v3.9.1.tar.gz && \
 # Clean-up
 RUN rm -rf /tmp/build
 
-# Download and build the deepsea-track repository
+# Build the deepsea-track repository
 COPY . /app/deepsea-track
 
 RUN cd /app/deepsea-track/ && \

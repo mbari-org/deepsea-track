@@ -1,0 +1,23 @@
+file(GLOB HEADER_LIST CONFIGURE_DEPENDS
+        "${deepsea-track_SOURCE_DIR}/include/deepsea/*.h"
+        "${deepsea-track_SOURCE_DIR}/include/deepsea/util/*.h")
+
+# Make an automatic library - will be static or dynamic based on user setting
+add_library(deepsea-track_library arguments.cc
+        event_object.cc logger.cc poisson_model.cc preprocess.cc
+        surprise_detector.cc surprise_map.cc visual_event.cc
+        visual_event_mgr.cc util/config.cc util/config_class_map.cc
+        util/utils.cc util/voc_object.cc ${HEADER_LIST})
+
+# We need this directory, and users of our library will need it too
+target_include_directories(deepsea-track_library PUBLIC ../include)
+
+# This depends on (header only) boost
+target_link_libraries(deepsea-track_library PRIVATE
+        ${XercesLib}
+        ${OpenCV_LIBS}
+        ${Boost_LIBRARIES}
+        nlohmann_json::nlohmann_json)
+
+# All users of this library will need at least C++11
+target_compile_features(deepsea-track_library PUBLIC cxx_std_11)
