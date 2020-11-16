@@ -1,6 +1,0 @@
-#pragma once
-
-namespace deepsea {
-#define BRANCH "@GIT_BRANCH@"
-#define COMMIT "@GIT_COMMIT_HASH@"
-}
