@@ -87,8 +87,10 @@ e.g.
 - process video file /data/benthic/video.mp4
 - input and xml in /data/benthic
 - output results to mapped /data mount in the directory /data/benthic_tracks
-- start at frame 1
+- *no start frame specified - start at frame 1*
 - *no stride specified*
+- *no resize_width specified - default to 512*
+- *no resize_height specified - default to 512*
 
 ```
 docker run -it --rm -v $PWD:/data mbari/deepsea-track --video_name video.mp4 --in_path /data/benthic/ --xml_path /data/benthic --out_path /data/benthic_tracks/
