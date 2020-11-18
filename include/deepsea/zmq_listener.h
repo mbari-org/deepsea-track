@@ -49,6 +49,8 @@ namespace deepsea {
 
         void cleanUp(const unsigned int max_frame);
 
+        bool initialized();
+
     private:
 
         list<EventObject> objects_;
@@ -56,6 +58,7 @@ namespace deepsea {
         string topic_;
         bool stopped_;
         bool started_;
+        bool initialized_;
         float resize_factor_height_;
         float resize_factor_width_;
     };
