@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+# [1.3.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.2.1...v1.3.0) (2020-11-18)
+
+
+### Features
+
+* added zma listener ([46c0cdd](http://bitbucket.org/mbari/deepsea-track/commits/46c0cdd184b24a9688c9af2207291e4751546746))
+
 ## [1.2.1](http://bitbucket.org/mbari/deepsea-track/compare/v1.2.0...v1.2.1) (2020-10-15)
 
 
