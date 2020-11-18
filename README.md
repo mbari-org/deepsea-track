@@ -6,9 +6,8 @@
 
 # About
 
-*deepsea-track* is lightweight tracking software for tracking multiple objects in deep sea underwater video.
-It is designed to be used with output from object detection models in data formatted into XML files in [PASCAL VOC](http://host.robots.ox.ac.uk/pascal/VOC/) format but 
-can be used with any output generated in XML format. It generates unique *VisualEvent* track sequences for analysis in JSON format.
+*deepsea-track* is online tracking software for tracking multiple objects in deep sea underwater video.
+It is designed to be used with output from object detection models sent over [ZeroMQ](https://zeromq.org/) or in data formatted into XML files in [PASCAL VOC](http://host.robots.ox.ac.uk/pascal/VOC/) format. It generates unique *VisualEvent* track sequences for analysis in JSON format.
 
 [click image below to see example in YouTube]
 [![Example video output](https://img.youtube.com/vi/cMZ8vr0aAYI/maxresdefault.jpg)](https://youtu.be/cMZ8vr0aAYI)
@@ -42,47 +41,63 @@ Alternatively, can be built natively for Mac with
 │   └── benthic
 │       ├── video.mp4
 │       ├── deepsea_class_map.json
+│       ├── deepsea_cfg.json
 │       ├── f001000.json
 │       ├── f001001.json
 │       ├── f001002.json
 │       ...
 │       ├── f001010.json
-│   └── benthic_results
+│   └── benthic_tracks
 ~~~
 
 ### Run in Docker
 
 The easiest way to run it is in a docker image. See https://hub.docker.com/u/mbari/deepsea-track for available releases.
 
-For example:
+To get a list of arguments:
 
-- absolute path to video/xml - both must be in the same directory
-- absolute path to store the results
-- start frame - 6-digit frame prefix to start, by default will process until the end of of the xml sequence.
-- frame width to resize the input video. Smaller width will process faster.
-- frame height to resize the input video. Smaller height will process faster.
-- stride(optional) - amount to stride between frames. Default is 1. Larger stride will process faster.
+```
+docker run mbari/deepsea-track --help
+```
+
+## *Arguments* 
+
+                        
+  * --video_name name of the video file to process, e.g. video.mp4, video.mov
+  * --in_path absolute path to the input artifacts: video.mov, deepsea_class_map.json and deepsea_cfg.json
+  * --out_path absolute path to save output artifacts
+  * --xml_path (optional) absolute path to directory with voc xml files. If absent, --address and --topic must be set
+  * --address (optional) socket address for the detector output, e.g. tcp://127.0.0.1:6432
+  * --topic (optional) topic to listen on at address, e.g. VisualEvents 
+  * --resize_width resize width in pixels for running the tracker, defaults to 512
+  * --resize_height resize height in pixels for running the tracker, defaults to 512
+  * --start_frame_num (optional) starting frame to process, 1-based. e.g. --start_frame=1 is the first frame in the video. Defaults to 1.
+  * --stride (optional) amount to stride seeding new detection between frames. A larger stride may process faster. Defaults to 1.
+  
+
+## Example
+
+Docker commands:
 
 -it = run interactively
 --rm = remove after execution
-```
-docker run -it --rm -v $PWD:/data mbari/deepsea-track <path to video/xml> <path to store results> <start frame num> <image width resize> <image height resize> <stride(optional)>
-```
+-v $PWD:/data = mount the current working directory to /data in the container
 
 e.g.
 - process video file /data/benthic/video.mp4
-- output results to mapped /data mount in the directory /data/benthic
+- input and xml in /data/benthic
+- output results to mapped /data mount in the directory /data/benthic_tracks
 - start at frame 1
 - *no stride specified*
+
 ```
-docker run -it --rm -v $PWD:/data mbari/deepsea-track  /data/benthic/video.mp4  /data/benthic 1 512 512
+docker run -it --rm -v $PWD:/data mbari/deepsea-track --video_name video.mp4 --in_path /data/benthic/ --xml_path /data/benthic --out_path /data/benthic_tracks/
 ```
 
-Frames and output will be rescaled by 0.5 in width and height in the above example.
 The output will look like:
            
 ~~~ 
-│   └── benthic_results
+│   └── benthic_tracks
 │       ├── f000001.json
 │       ├── f000002.json
 │       ├── f000003.json
@@ -211,6 +226,9 @@ e.g. this uses a combined MEDIANFLOW and KCF tracker:
 
 # Building
 
+An image is available on hub.docker.com at [mbari/deepsea-track](https://hub.docker.com/r/mbari/deepsea-track).
+This can be build from source with:
+
 ## Docker
 ```
 docker build -t deepsea-track .
@@ -228,11 +246,14 @@ tar -zxvf xerces-c-3.2.3.tar.gz &&
 cd xerces-c-3.2.3 && \
     ./configure CFLAGS="-arch x86_64" CXXFLAGS="-arch x86_64" &&
     make -j8 && make install
+```
+
+## Roadmap
+-  Add support for inline object detection inference using the [OpenVINO Toolkit](docs.openvinotoolkit.org)
+-  Add to docker build 
+```
 cd ../../thirdparty &&
 git clone --recursive https://github.com/Microsoft/onnxruntime && \
     cd ./onnxruntime && build.sh --config RelWithDebInfo --build_shared_lib --parallel && \
     cd ./Linux/RelWithDebInfo && make install lib
 ```
-
-## Roadmap
--  Add support for object detection inference using the [OpenVINO Toolkit](docs.openvinotoolkit.org)
