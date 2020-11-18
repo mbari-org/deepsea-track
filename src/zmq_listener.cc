@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <zmq.hpp>
-#include <zmq_addon.hpp>
 #include <deepsea/util/utils.h>
 #include <deepsea/zmq_listener.h>
 
@@ -15,10 +14,14 @@ namespace deepsea {
                             const float resize_factor_height):
             stopped_(false),
             started_(false),
+            initialized_(false),
             address_(address),
             topic_(topic),
             resize_factor_width_(resize_factor_width),
             resize_factor_height_(resize_factor_height){
+        // rudimentary check for populated address/topic; todo: add check for correct protocol
+        if (address.length() > 0 and topic.length() > 0)
+            initialized_ = true;
     }
 
 // ######################################################################
@@ -43,7 +46,7 @@ namespace deepsea {
         try {
             zmq::context_t context(1);
             zmq::socket_t subscriber(context, ZMQ_SUB);
-            const std::chrono::milliseconds timeout{5000};
+            const std::chrono::milliseconds timeout{120000};
             string start_msg = "start";
             zmq::message_t msg;
             subscriber.connect(address_);
@@ -52,10 +55,10 @@ namespace deepsea {
             item[0].socket = subscriber;
             item[0].events = ZMQ_POLLIN;
             int rc = zmq::poll(item, 1, timeout); // poll for timeout period only
-            assert(rc == 1); //todo put a meaningful message here if does timeout. rc=1 means it returned the correct item
+            assert(rc == 1); //todo put a meaningful message here if does timeout. rc=1 means it returned one item
             this->started_ = true;
             while(!stopped_) {
-                cout << "Waiting for visual events from " << address_ << endl;
+                cout << "Listening for visual events topic " << topic_ << " on " << address_ << endl;
                 auto res = subscriber.recv(msg, zmq::recv_flags::none);
                 string s = string(static_cast<char*>(msg.data()), msg.size());
                 int xmin, xmax, ymin, ymax;
@@ -123,6 +126,11 @@ namespace deepsea {
 // ######################################################################
     bool ZMQListener::started() {
         return this->started_;
+    }
+
+// ######################################################################
+    bool ZMQListener::initialized() {
+        return this->initialized_;
     }
 
 }
