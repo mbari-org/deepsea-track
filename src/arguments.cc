@@ -52,8 +52,7 @@ namespace deepsea {
             cout << "Video to process was set to " << video_path_ << endl;
             //TODO: check video_path existance
         } else {
-            cout << "Must set the video_path.\n";
-            cout << "Must set the video_path with --video_path";
+            cout << "Must set the video_path with --video_path" << endl;
             return;
         }
 

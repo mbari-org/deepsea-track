@@ -35,6 +35,7 @@ include_directories( ${Boost_INCLUDE_DIR} )
 find_package(XercesC 3.2.3 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
+find_package(cppzmq 4.3.3 REQUIRED)
 
 #######################################
 # Setup directory configuration
