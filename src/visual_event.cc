@@ -16,7 +16,7 @@ namespace deepsea {
 
 // ######################################################################
     VisualEvent::VisualEvent(uuids::uuid uuid, const Mat &img, const EventObject &evt_obj, const Config &cfg,
-                             ConfigMaps &cfg_map)//, Preprocess *preprocess)
+                             ConfigMaps &cfg_map)
             : uuid_(uuid),
               start_frame_(evt_obj.getFrameNum()),
               end_frame_(evt_obj.getFrameNum()),
@@ -66,7 +66,7 @@ namespace deepsea {
         tracker_failed_[0] = false;
         tracker_failed_[1] = false;
 
-        if (boundsCheck(img.size(), evt_obj.getBboxTracker())) {
+        if (end_frame_ - start_frame_ > 1 && boundsCheck(img.size(), evt_obj.getBboxTracker())) {
             cout << frame_num << ":" << boost::uuids::to_string(evt_obj.getUuid())
                  << " Too close to edge to start tracker1" << endl;
             tracker_failed_[0] = true;
@@ -105,7 +105,7 @@ namespace deepsea {
 // ######################################################################
     void VisualEvent::updatePrediction(const Mat &img, const unsigned int frame_num) {
         Rect2d r1, r2;
-        if (objects_.back().getFrameNum() < frame_num) {
+        if (end_frame_ - start_frame_ > 1 && objects_.back().getFrameNum() < frame_num) {
             EventObject evt_obj = objects_.back();
             if (trackers_[0]->update(img, r1)) {
                 Size size = img.size();
