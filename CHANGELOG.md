@@ -1,5 +1,17 @@
 # DeepSea Track Changelog
 
+# [1.4.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.3.0...v1.4.0) (2020-11-18)
+
+
+### Features
+
+* added all arguments ([326e2df](http://bitbucket.org/mbari/deepsea-track/commits/326e2dfb2354c4246f7c69a71ec439a476062627))
+* added example output ([ed58536](http://bitbucket.org/mbari/deepsea-track/commits/ed5853629a58ce8dd754c3b61d09b32ffb476729))
+* added second tracker and min frame of 1 as default ([8529ed5](http://bitbucket.org/mbari/deepsea-track/commits/8529ed5301ef92310fb678435b53e9765559ce68))
+* added second tracker as default ([20d596a](http://bitbucket.org/mbari/deepsea-track/commits/20d596ae778fb0812a2c2eb046725783e5fa7574))
+* removed unused code, initialized logic and more descriptive output ([1da7c93](http://bitbucket.org/mbari/deepsea-track/commits/1da7c93ff3de574a2a6f49e558848a4932e55d2b))
+* skip edge check on first frame ([2421260](http://bitbucket.org/mbari/deepsea-track/commits/2421260a032bc9e1dca318a678d31d916d1bd162))
+
 # [1.3.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.2.1...v1.3.0) (2020-11-18)
 
 
