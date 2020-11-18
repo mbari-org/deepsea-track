@@ -1,6 +1,6 @@
 {
   "tracker1": 0,
-  "tracker2": -1,
+  "tracker2": 1,
   "min_event_frames": 1,
   "display_wait_msecs": 200,
   "display": true
