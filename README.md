@@ -7,7 +7,8 @@
 # About
 
 *deepsea-track* is online tracking software for tracking multiple objects in deep sea underwater video.
-It is designed to be used with output from object detection models sent over [ZeroMQ](https://zeromq.org/) or in data formatted into XML files in [PASCAL VOC](http://host.robots.ox.ac.uk/pascal/VOC/) format. It generates unique *VisualEvent* track sequences for analysis in JSON format.
+It is designed to be used with output from object detection models sent over [ZeroMQ](https://zeromq.org/)
+ or in data formatted into XML files in [PASCAL VOC](http://host.robots.ox.ac.uk/pascal/VOC/) format. It generates unique *VisualEvent* track sequences for analysis in JSON format.
 
 [click image below to see example in YouTube]
 [![Example video output](https://img.youtube.com/vi/cMZ8vr0aAYI/maxresdefault.jpg)](https://youtu.be/cMZ8vr0aAYI)
@@ -242,6 +243,7 @@ Note that the CMake files in this project require version 3.15 or higher
 brew install boost
 brew tap nlohmann/json
 brew install nlohmann/json
+brew install zeromq
 cd thirdparty && 
 curl -O https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.3.tar.gz &&
 tar -zxvf xerces-c-3.2.3.tar.gz &&
