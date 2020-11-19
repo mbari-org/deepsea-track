@@ -58,7 +58,7 @@ RUN curl -L https://downloads.apache.org//xerces/c/3/sources/xerces-c-3.2.3.tar.
     cmake ./ && \
     make -j8 &&  make install
 
-RUN curl -L https://github.com/nlohmann/json/archive/v3.9.1.tar.gz --output && v3.9.1.tar.gz \
+RUN curl -L https://github.com/nlohmann/json/archive/v3.9.1.tar.gz --output v3.9.1.tar.gz \
     tar -xvzf v3.9.1.tar.gz && cd v3.9.1 && \
     make -j8 && make install
 
