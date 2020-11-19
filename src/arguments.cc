@@ -35,8 +35,8 @@ namespace deepsea {
         po::options_description desc("Allowed Arguments");
         desc.add_options()
                 ("help", "produce help message")
-                ("start_frame_num", po::value<unsigned int>(&start_frame_num_)->default_value(1),
-                        "starting frame to process, 1-based. e.g. --start_frame=1 is the first frame in the video")
+                ("start_frame_num", po::value<unsigned int>(&start_frame_num_)->default_value(0),
+                        "starting frame to process, e.g. --start_frame=0 is the first frame in the video")
                 ("resize_width", po::value<unsigned int>(&resize_width_)->default_value(512),
                         "resize width in pixels for running the tracker")
                 ("resize_height", po::value<unsigned int>(&resize_height_)->default_value(512),
@@ -104,7 +104,7 @@ namespace deepsea {
             }
         }
         if (!vm.count("start_frame_num")) {
-            start_frame_num_ = 1;
+            start_frame_num_ = 0;
         }
         cout << "Start processing frame " << start_frame_num_ << endl;
 
