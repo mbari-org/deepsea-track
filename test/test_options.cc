@@ -28,6 +28,6 @@ int main(int argc, char **argv)
     Arguments o(argc, argv);
 
     cout << "default options" << endl;
-    cout << "video path: " << o.getVideoPath() << endl;
+    cout << "video name: " << o.video_name_ << endl;
     return 0;
 }

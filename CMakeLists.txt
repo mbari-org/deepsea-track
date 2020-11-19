@@ -7,6 +7,7 @@ project(deepsea-track VERSION 1.0 DESCRIPTION "MBARI Deep Sea Tracker" LANGUAGES
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_SOURCE_DIR src)
 set(CMAKE_THIRDPARTY_SOURCE_DIR extern)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 #######################################
 # Setup auto generation for GIT hash

@@ -28,15 +28,10 @@ RUN curl -L https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.1
 WORKDIR /tmp/build
 
 # Download and build OpenCV with contrib modules
-# https://linuxize.com/post/how-to-install-opencv-on-ubuntu-18-04/
-# Clone repositories
-RUN git clone https://github.com/opencv/opencv.git && \
-    git clone https://github.com/opencv/opencv_contrib.git
-
-# Create the temporary build directory and build using CMake.
-RUN cd /tmp/build/opencv && \
-    mkdir build && \
-    cd build && \
+RUN curl -L https://github.com/opencv/opencv/archive/4.5.0.tar.gz --output opencv4.5.0.tar.gz && \
+    curl -L https://github.com/opencv/opencv_contrib/archive/4.5.0.tar.gz --output opencv-contrib4.5.0.tar.gz && \ 
+    tar -xzf opencv4.5.0.tar.gz && tar -xzf opencv-contrib4.5.0.tar.gz && \
+    cd opencv-4.5.0 && mkdir build && cd build && \
     cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D WITH_TBB=ON \
     -D WITH_OPENMP=ON \
@@ -46,8 +41,8 @@ RUN cd /tmp/build/opencv && \
     -D BUILD_DOCS=OFF \
     -D BUILD_PERF_TESTS=OFF \
     -D BUILD_TESTS=OFF \
-    -D OPENCV_EXTRA_MODULES_PATH=/tmp/build/opencv_contrib/modules \
-    /tmp/build/opencv/ && \
+    -D OPENCV_EXTRA_MODULES_PATH=/tmp/build/opencv_contrib-4.5.0/modules \
+    /tmp/build/opencv-4.5.0/ && \
     make -j8 && make install
 
 # Download and build Xerces-C for parsing XML
@@ -58,11 +53,11 @@ RUN curl -L https://downloads.apache.org//xerces/c/3/sources/xerces-c-3.2.3.tar.
     cmake ./ && \
     make -j8 &&  make install
 
-RUN curl -L https://github.com/nlohmann/json/archive/v3.9.1.tar.gz --output v3.9.1.tar.gz \
-    tar -xzf v3.9.1.tar.gz && cd v3.9.1 && \
-    make -j8 && make install
+RUN curl -L https://github.com/nlohmann/json/archive/v3.9.1.tar.gz --output v3.9.1.tar.gz && \
+    tar -xzf v3.9.1.tar.gz && cd json-3.9.1 && \
+    cmake . && make -j8 && make install
 
-RUN curl -L https://github.com/zeromq/cppzmq/archive/v4.7.1.tar.gz --output v4.7.1.tar.gz \
+RUN curl -L https://github.com/zeromq/cppzmq/archive/v4.7.1.tar.gz --output v4.7.1.tar.gz && \
     tar -xzf v4.7.1.tar.gz && cd cppzmq-4.7.1 && \
     cmake -DCPPZMQ_BUILD_TESTS=OFF . && make -j8 && make install
 

@@ -12,11 +12,3 @@ target_link_libraries(deepsea-track PRIVATE
         ${XercesC_LIBRARIES}
         cppzmq
         deepsea-track_library)
-
-target_link_libraries(deepsea-listen PRIVATE
-        ${Boost_LIBRARIES}
-        nlohmann_json::nlohmann_json
-        ${OpenCV_LIBS}
-        ${XercesC_LIBRARIES}
-        cppzmq
-        deepsea-track_library)
