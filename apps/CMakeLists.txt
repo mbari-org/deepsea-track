@@ -1,5 +1,4 @@
 add_executable(deepsea-track deepsea-track.cc)
-add_executable(deepsea-listen deepsea-listen.cc)
 target_compile_features(deepsea-track PRIVATE cxx_std_17)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 configure_file(

@@ -22,6 +22,7 @@
 #include <opencv2/core/ocl.hpp>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <nlohmann/json.hpp>
@@ -31,6 +32,8 @@
 #include <deepsea/util/utils.h>
 #include <deepsea/visual_event_mgr.h>
 #include <deepsea/logger.h>
+#include <deepsea/zmq_listener.h>
+#include <deepsea/arguments.h>
 
 using namespace cv;
 using namespace std;
@@ -38,102 +41,104 @@ using namespace deepsea;
 
 int main( int argc, char** argv ) {
 
-    // show help
-    if (argc < 2) {
-        cout <<
-             " Usage: deepsea-track <path to video> <path to xml> <start frame num> <frame resize width> < frame resize height> <stride(optional)>\n"
-             " examples:\n"
-             " deepsea-track $PWD/data/benthic/D0232_03HD_00-02-30.mov $PWD/data/benthic/ 1 512 512 \n"
-             << endl;
+    //////////////////////////////////////////////////////////
+    // parse arguments
+    Arguments args(argc, argv);
+    if (!args.initialized_)
         return -1;
-    }
 
-    try {
-        XMLPlatformUtils::Initialize();
-    } catch(...) {
-        cout << "error initializing XML reader:" << endl;
-        return -1;
-    }
-
-    int frame_num = 1;
-    int stride = 1;
-    list<VOCObject> vocs;
-    XercesDOMParser *parser = new XercesDOMParser;
+    //////////////////////////////////////////////////////////
+    // initialize classes and variables
+    int frame_num;
     Mat frame, frame_enhanced, frame_resized;
-    unsigned int start_frame_num;
-    int resize_height, resize_width;
-    string video = argv[1];
-    string xml_path = argv[2];
-    stringstream ssf;           ///! starting frame
-    ssf << argv[3];
-    ssf >> start_frame_num;     ///! percent to resize video
-    stringstream ssw;
-    ssw << argv[4];
-    ssw >> resize_width;
-    stringstream ssh;
-    ssh << argv[4];
-    ssh >> resize_height;
-    stringstream sss;
-    if (argc >= 8) {
-        sss << argv[7];
-        sss >> stride;          ///! stride parameter
-    }
-
-    // Write the configuration.
-    cout << "Run configuration: starting frame (" << start_frame_num;
-    cout << "), resize (" << resize_width <<  "x" << resize_height << "), stride (" << stride;
-    cout << ")" << endl;
-
     ConfigMaps cfg_map;
-    std::string filename = xml_path + "deepsea_class_map.json";
-    try {
-        initConfigMaps(filename, cfg_map);
-    } catch(...) {
-        cout << "error loading class maps:" << filename << endl;
-        return -1;
-    }
-
-    filename = xml_path + "deepsea_cfg.json";
-    Config cfg(filename);
-    assert(cfg.isInitialized());
-
-    std::cout << cfg.getProgram() << endl;
-
-    VideoCapture cap(video);
+    VideoCapture cap(args.in_path_ + "/" + args.video_name_);
     int width  = cap.get(CAP_PROP_FRAME_WIDTH);
     int height = cap.get(CAP_PROP_FRAME_HEIGHT);
     float fps = cap.get(CAP_PROP_FPS);
-    float resize_factor_width = float(resize_width) / float(width);
-    float resize_factor_height = float(resize_height) / float(height);
-    if (start_frame_num > 1) {
-        cap.set(CAP_PROP_POS_FRAMES, start_frame_num);
-        frame_num = start_frame_num;
-    }
+    float resize_factor_width = float(args.resize_width_) / float(width);
+    float resize_factor_height = float(args.resize_height_) / float(height);
+    if (args.start_frame_num_ > 1)
+        cap.set(CAP_PROP_POS_FRAMES, args.start_frame_num_);
+    frame_num = args.start_frame_num_;
+    VideoWriter out(args.out_path_ + "results.mp4",
+                    VideoWriter::fourcc('H', '2', '6', '4'),
+                    fps, Size(width, height));
+    Size scaled_size(Size(args.resize_width_, args.resize_height_));
+    Preprocess pre(scaled_size, 3, args.video_name_);
 
-    VideoWriter out(xml_path + "results.mp4",
-            VideoWriter::fourcc('H','2','6','4'),
-            fps, Size(width,height));
-
-    Size scaled_size(Size(resize_width, resize_height));
-    Preprocess pre(scaled_size, 3, video);
-    Logger log(cfg, start_frame_num, xml_path);
+    //////////////////////////////////////////////////////////
+    // get configuration
+    cout << "Parsing configuration deepsea_class_map.json" << endl;
+    assert(initConfigMaps(args.in_path_ + "deepsea_class_map.json", cfg_map));
+    cout << "Parsing configuration deepsea_cfg.json" << endl;
+    Config cfg(args.in_path_ + "deepsea_cfg.json");
+    assert(cfg.isInitialized());
+    Logger log(cfg, frame_num, args.out_path_);
     VisualEventManager manager(cfg, cfg_map);
 
-    cout << "Starting " << cfg.getProgram() << " , press ESC to quit" << endl;
+    //////////////////////////////////////////////////////////
+    // if loading from precomputed detections in xml files, initialize the parser
+    XercesDOMParser *parser = NULL;
+    if (args.xml_path_.length() > 0) {
+        try {
+            XMLPlatformUtils::Initialize();
+        } catch (...) {
+            cout << "error initializing XML reader:" << endl;
+            return -1;
+        }
+        parser = new XercesDOMParser;
+    }
+    //////////////////////////////////////////////////////////
+    // if loading detections over zmq, launch thread as daemon to listen for events
+    ZMQListener zmq(args.address_, args.topic_, resize_factor_width, resize_factor_height);
+    thread zmqThread = thread();
+    if (zmq.initialized()) {
+        thread zmqThread(&ZMQListener::listen, &zmq);
+        zmqThread.detach();
+    }
 
+    //////////////////////////////////////////////////////////
+    // begin processing
+    cout << "Starting " << cfg.getProgram() << " , press ESC to quit" << endl;
 
     while(cap.read(frame)) {
 
         cout << "====================== Processing frame " << frame_num << "====================== " << endl;
 
-        if (frame_num == start_frame_num || (frame_num % stride) == 0) {
-            // read xml
-            parser->resetDocumentPool();
-            string xml_filename = cv::format("%s/f%06d.xml", xml_path.c_str() , frame_num);
+        // if loading detections over zmq, wait for start
+        if (zmq.initialized()) while (!zmq.started()) {
+                cout << "waiting for zmq messages to  start" << endl;
+            };
 
-            if (Utils::doesPathExist(xml_filename)) {
-                parser->parse(xml_filename.c_str());
-                getObjectValues(parser, vocs, cfg_map);
+        list<EventObject> event_objs;
+        list<VOCObject> voc_objs;
+        if (frame_num == args.start_frame_num_ || (frame_num % args.stride_) == 0) {
+
+            // if have voc formatted xml, read detections from files
+            if (args.hasXml()) {
+                parser->resetDocumentPool();
+                string xml_filename = cv::format("%s/f%06d.xml", args.xml_path_.c_str() , frame_num);
+
+                if (Utils::doesPathExist(xml_filename)) {
+                    parser->parse(xml_filename.c_str());
+                    getObjectValues(parser, voc_objs, cfg_map);
+                    // rescale and store VOCObjects in VisualObjects
+                    list<VOCObject>::iterator itvoc;
+                    for (itvoc = voc_objs.begin(); itvoc != voc_objs.end(); ++itvoc) {
+                        Rect2d  r = (*itvoc).getBox();
+                        r.x = int(r.x * resize_factor_width);
+                        r.y = int(r.y * resize_factor_height);
+                        r.width = int(r.width * resize_factor_width);
+                        r.height = int(r.height * resize_factor_height);
+                        (*itvoc).setBox(r);
+                        EventObject o((*itvoc), 0, frame_num);
+                        event_objs.push_back(o);
+                    }
+                }
+            }
+            else { // otherwise read detections sent over zmq
+                event_objs = zmq.getObjects(frame_num);
             }
         }
 
@@ -143,22 +148,8 @@ int main( int argc, char** argv ) {
         // enhance
         frame_enhanced = pre.update(frame_resized);
 
-        // rescale and store VOCObjects in VisualObjects
-        list<VOCObject>::iterator itvoc;
-        list<EventObject> vobs;
-        for (itvoc = vocs.begin(); itvoc != vocs.end(); ++itvoc) {
-            Rect2d  r = (*itvoc).getBox();
-            r.x = int(r.x * resize_factor_width);
-            r.y = int(r.y * resize_factor_height);
-            r.width = int(r.width * resize_factor_width);
-            r.height = int(r.height * resize_factor_height);
-            (*itvoc).setBox(r);
-            EventObject o((*itvoc), 0, frame_num);
-            vobs.push_back(o);
-        }
-
         // run the manager and time it
-        manager.run(vobs, frame_enhanced, frame_num);
+        manager.run(event_objs, frame_enhanced, frame_num);
         fps = getTickFrequency() / (getTickCount() - timer);
 
         // get list of visual objects
@@ -172,13 +163,12 @@ int main( int argc, char** argv ) {
             for (itve = events.begin(); itve != events.end(); ++itve) {
 
                 // only show valid events
-                if ((*itve)->getState() != VisualEvent::State::VALID) {
+                if ((*itve)->getState() != VisualEvent::State::VALID)
                     continue;
-                }
 
                 EventObject evt_obj = (*itve)->getLatestObject();
 
-                // rescale boxes in case tracking on reduced frame size
+                // rescale boxes if tracking on reduced frame size
                 Rect2d bbox = evt_obj.getBboxTracker();
                 Rect2d bbox_tracker = Utils::rescale(resize_factor_width, resize_factor_height, bbox);
 
@@ -211,12 +201,15 @@ int main( int argc, char** argv ) {
         }
 
         frame_num +=1;
-        vocs.clear();
+        voc_objs.clear();
+        if (zmq.initialized())
+            zmq.cleanUp(frame_num);
     }
 
     cout << "Done!" << endl;
     cap.release();
     out.release();
     destroyAllWindows();
+    assert(!zmqThread.joinable());
     return 0;
 }
