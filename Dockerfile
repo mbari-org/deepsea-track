@@ -12,7 +12,7 @@ RUN apt-get update --fix-missing && \
     libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
     libxvidcore-dev libx264-dev libjpeg-dev libpng-dev libtiff-dev \
     gfortran openexr libatlas-base-dev python3-dev python3-numpy \
-    libtbb2 libtbb-dev libdc1394-22-dev curl libboost-all-dev
+    libtbb2 libtbb-dev libdc1394-22-dev curl libboost-all-dev libzmq3-dev
 
 # Install CMake
 RUN curl -L https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3-Linux-x86_64.sh \
@@ -53,13 +53,17 @@ RUN cd /tmp/build/opencv && \
 # Download and build Xerces-C for parsing XML
 RUN curl -L https://downloads.apache.org//xerces/c/3/sources/xerces-c-3.2.3.tar.gz \
     --output xerces.tar.gz && \
-    tar -xvzf xerces.tar.gz && \
+    tar -xzf xerces.tar.gz && \
     cd xerces-c-3.2.3 && \
     cmake ./ && \
     make -j8 &&  make install
 
 RUN curl -L https://github.com/nlohmann/json/archive/v3.9.1.tar.gz --output v3.9.1.tar.gz \
-    tar -xvzf v3.9.1.tar.gz && cd v3.9.1 && \
+    tar -xzf v3.9.1.tar.gz && cd v3.9.1 && \
+    make -j8 && make install
+
+RUN curl -L https://github.com/zeromq/cppzmq/archive/v4.7.1.tar.gz --output v4.7.1.tar.gz \
+    tar -xzf v4.7.1.tar.gz && cd cppzmq-4.7.1 && \
     make -j8 && make install
 
 # Clean-up
