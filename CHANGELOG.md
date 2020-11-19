@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+# [1.5.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.4.1...v1.5.0) (2020-11-19)
+
+
+### Features
+
+* added tests ([f846835](http://bitbucket.org/mbari/deepsea-track/commits/f8468356edcc17039e2870113b00e6eb6f3b8400))
+
 ## [1.4.1](http://bitbucket.org/mbari/deepsea-track/compare/v1.4.0...v1.4.1) (2020-11-19)
 
 
