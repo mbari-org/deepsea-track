@@ -64,7 +64,7 @@ RUN curl -L https://github.com/nlohmann/json/archive/v3.9.1.tar.gz --output v3.9
 
 RUN curl -L https://github.com/zeromq/cppzmq/archive/v4.7.1.tar.gz --output v4.7.1.tar.gz \
     tar -xzf v4.7.1.tar.gz && cd cppzmq-4.7.1 && \
-    make -j8 && make install
+    cmake -DCPPZMQ_BUILD_TESTS=OFF . && make -j8 && make install
 
 # Clean-up
 RUN rm -rf /tmp/build
