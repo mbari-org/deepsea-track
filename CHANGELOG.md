@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+# [1.6.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.5.0...v1.6.0) (2020-11-19)
+
+
+### Features
+
+* zmq and args added ([4e6a851](http://bitbucket.org/mbari/deepsea-track/commits/4e6a8511e17a47f39a13afedb8a57b55b22e37b2))
+
 # [1.5.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.4.1...v1.5.0) (2020-11-19)
 
 
