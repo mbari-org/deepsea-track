@@ -61,15 +61,16 @@ RUN curl -L https://github.com/zeromq/cppzmq/archive/v4.7.1.tar.gz --output v4.7
     tar -xzf v4.7.1.tar.gz && cd cppzmq-4.7.1 && \
     cmake -DCPPZMQ_BUILD_TESTS=OFF . && make -j8 && make install
 
+# Build the deepsea-track repository
+COPY . /tmp/build 
+
+RUN /opt/cmake/bin/cmake --version && \
+    /opt/cmake/bin/cmake ./ && \
+    make && cp apps/deepsea-track /usr/local/bin/
+
 # Clean-up
 RUN rm -rf /tmp/build
 
-# Build the deepsea-track repository
-COPY . /app/deepsea-track
+WORKDIR /app
 
-RUN cd /app/deepsea-track/ && \
-    /opt/cmake/bin/cmake --version && \
-    /opt/cmake/bin/cmake ./ && \
-    make
-
-CMD /app/deepsea-track/deepsea-track
+ENTRYPOINT ["/usr/local/bin/deepsea-track"]
