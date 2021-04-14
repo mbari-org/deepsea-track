@@ -65,7 +65,7 @@ namespace deepsea {
         // of same or different classes. But if it is set too high e.g. 1,
         // then you get multiple boxes for the same object.
         // TODO: move into the config file
-        float score_threshold = 0.8;
+        float score_threshold = 0.6;
         float nms_threshold = 0.4;
         NMSBoxes(boxes, scores, score_threshold, nms_threshold, indices);
 
