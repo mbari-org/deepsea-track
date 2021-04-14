@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+# [1.7.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.6.0...v1.7.0) (2020-11-19)
+
+
+### Features
+
+* added index from 1 ([d9d5933](http://bitbucket.org/mbari/deepsea-track/commits/d9d593331248973b1b3f6efae47bb3601b3e2bf0))
+
 # [1.6.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.5.0...v1.6.0) (2020-11-19)
 
 
