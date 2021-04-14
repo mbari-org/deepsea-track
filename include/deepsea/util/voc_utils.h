@@ -95,6 +95,7 @@ namespace deepsea {
                     DOMNode::ELEMENT_NODE) {                        // Ensures we found a <tag>
                     string tag_name = XMLString::transcode(childNode->getNodeName());        // <Gets Tag Name>
                     string tag_value = XMLString::transcode(childNode->getTextContent());    // <tag> Gets Value </tag>
+                    tmp_object.setConfidence(1.0); // set confidence to 1.0 as default
 
                     // grab bounding box dimensions, otherwise, get the <name>
                     if (tag_name == "bndbox") {
