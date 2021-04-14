@@ -1,5 +1,17 @@
 # DeepSea Track Changelog
 
+# [1.8.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.7.0...v1.8.0) (2021-04-14)
+
+
+### Bug Fixes
+
+* add default confidence ([fd23bd5](http://bitbucket.org/mbari/deepsea-track/commits/fd23bd593e877b0382aa2ee8086f1233cb4a09a7))
+
+
+### Features
+
+* reduce score threshold to 0.6 ([b6b1cf7](http://bitbucket.org/mbari/deepsea-track/commits/b6b1cf7107f63fdf60449f819b48250fae260225))
+
 # [1.7.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.6.0...v1.7.0) (2020-11-19)
 
 
