@@ -112,7 +112,7 @@ namespace deepsea {
             cout << "Resizing to " << resize_width_ << "x" << resize_height_ << endl;
         }
         if (vm.count("stride")) {
-            cout << "Skipping every " << stride_ << " detection" << endl;
+            cout << "Skipping every " << stride_ << " frame" << endl;
         }
         if (!failure)
             initialized_ = true;
