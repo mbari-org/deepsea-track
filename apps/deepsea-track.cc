@@ -65,7 +65,7 @@ int main( int argc, char** argv ) {
                     VideoWriter::fourcc('H', '2', '6', '4'),
                     fps, Size(width, height));
     Size scaled_size(Size(args.resize_width_, args.resize_height_));
-    Preprocess pre(scaled_size, 3, args.video_name_);
+    Preprocess pre(scaled_size, 3, args.video_path_);
 
     //////////////////////////////////////////////////////////
     // get configuration
