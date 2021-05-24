@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+## [1.9.1](http://bitbucket.org/mbari/deepsea-track/compare/v1.9.0...v1.9.1) (2021-05-24)
+
+
+### Bug Fixes
+
+* correct arg ([8185def](http://bitbucket.org/mbari/deepsea-track/commits/8185defca591843c851a704b144fa08a7fd74d67))
+
 # [1.9.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.8.0...v1.9.0) (2021-05-24)
 
 
