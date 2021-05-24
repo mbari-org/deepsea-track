@@ -8,7 +8,11 @@
 
 *deepsea-track* is online tracking software for tracking multiple objects in deep sea underwater video.
 It is designed to be used with output from object detection models sent over [ZeroMQ](https://zeromq.org/)
- or in data formatted into XML files in [PASCAL VOC](http://host.robots.ox.ac.uk/pascal/VOC/) format. It generates unique *VisualEvent* track sequences for analysis in JSON format.
+ or in data formatted into XML files in [PASCAL VOC](http://host.robots.ox.ac.uk/pascal/VOC/) format. 
+It generates unique *VisualEvent* track sequences in JSON format.
+
+---
+Documentation for this is available at http://docs.mbari.org/deepsea-track
 
 [click image below to see example in YouTube]
 [![Example video output](https://img.youtube.com/vi/cMZ8vr0aAYI/maxresdefault.jpg)](https://youtu.be/cMZ8vr0aAYI)
@@ -64,12 +68,12 @@ docker run mbari/deepsea-track --help
 ## *Arguments* 
 
                         
-  * --video_name name of the video file to process, e.g. video.mp4, video.mov
-  * --in_path absolute path to the input artifacts: video.mov, deepsea_class_map.json and deepsea_cfg.json
+  * --video_path absolute path to the video file to process, e.g. /data/video.mp4, /data/video.mov
+  * --config_path absolute path to the configuration files: deepsea_class_map.json and deepsea_cfg.json
   * --out_path absolute path to save output artifacts
   * --xml_path (optional) absolute path to directory with voc xml files. If absent, --address and --topic must be set
   * --address (optional) socket address for the detector output, e.g. tcp://127.0.0.1:6432
-  * --topic (optional) topic to listen on at address, e.g. VisualEvents 
+  * --topic (optional) topic to listen on at address, e.g. VisualEvents. If specified, must also specify the --address 
   * --resize_width resize width in pixels for running the tracker, defaults to 512
   * --resize_height resize height in pixels for running the tracker, defaults to 512
   * --start_frame_num (optional) starting frame to process, 1-based. e.g. --start_frame=1 is the first frame in the video. Defaults to 1.
@@ -80,21 +84,21 @@ docker run mbari/deepsea-track --help
 
 Docker commands:
 
--it = run interactively
---rm = remove after execution
--v $PWD:/data = mount the current working directory to /data in the container
+ * -it = run interactively
+ * --rm = remove after execution
+ * -v $PWD:/data = mount the current working directory to /data in the container
 
 e.g.
 - process video file /data/benthic/video.mp4
-- input and xml in /data/benthic
+- configuration files in /data/benthic
 - output results to mapped /data mount in the directory /data/benthic_tracks
 - *no start frame specified - start at frame 1*
-- *no stride specified*
+- *no stride specified - process every frame*
 - *no resize_width specified - default to 512*
 - *no resize_height specified - default to 512*
 
 ```
-docker run -it --rm -v $PWD:/data mbari/deepsea-track --video_name video.mp4 --in_path /data/benthic/ --xml_path /data/benthic --out_path /data/benthic_tracks/
+docker run -it --rm -v $PWD:/data mbari/deepsea-track --video_path /data/benthic/video.mp4 --cfg_path /data/benthic/ --xml_path /data/benthic --out_path /data/benthic_tracks/
 ```
 
 The output will look like:
@@ -115,7 +119,7 @@ The output will look like:
 
 Data is output per each frame with all events tracked per the following schema:
 
-```
+```json
 {
    "$schema": "http://json-schema.org/draft-04/schema#",
    "title": "deepsea-track",
@@ -176,7 +180,7 @@ Data is output per each frame with all events tracked per the following schema:
 
 The *deep_class_map.json* should contain the mapping from your IDs to actual class names.
 This is human-readable descriptions and colors to associate to each class, e.g.
-```
+```json
 {
     "items":[
       {
@@ -205,7 +209,7 @@ These correspond to 4 of the 8 available [OpenCV](https://docs.opencv.org/) trac
 
 e.g. this uses the MEDIANFLOW tracker and drops the second tracker:
 *deepsea_cfg.json*
-```
+```json
 {
   "tracker1": 0,
   "tracker2": -1,
@@ -214,7 +218,7 @@ e.g. this uses the MEDIANFLOW tracker and drops the second tracker:
 ```
 e.g. this uses a combined MEDIANFLOW and KCF tracker:
 *deepsea_cfg.json*
-```
+```json
 {
   "tracker1": 0,
   "tracker2": 1,

@@ -45,11 +45,11 @@ namespace deepsea {
 
         bool initialized_;
 
-        string video_name_;              ///! name of the video file to process
         string xml_path_;                ///! absolute path to directory with voc xml files
         string out_path_;                ///! absolute path to save any output artifacts
         unsigned int start_frame_num_;   ///! starting frame; used only during startup
-        string in_path_;                 ///! input path for the video file, deepsea_class_map.json and deepsea_cfg.json files
+        string video_path_;              ///! absolute path to the video file
+        string cfg_path_;                ///! absolute path to the configuration files: deepsea_class_map.json and deepsea_cfg.json
         unsigned int resize_width_;      ///! resize width in pixels for resizing the video before running the tracker
         unsigned int resize_height_;     ///! resize hight in pixels for resizing the video before running the tracker
         unsigned int stride_;            ///! stride in detections, 1-based. e.g. --stride=5 will skip seeding new events to every 5th detection

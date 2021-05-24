@@ -43,12 +43,12 @@ namespace deepsea {
                         "resize width in pixels for running the tracker")
                 ("stride", po::value<unsigned int>(&stride_)->default_value(1),
                         "stride in detections, 1-based. e.g. --stride=5 will skip ip seeding new events to every 5th detection")
-                ("video_name", po::value<string>(&video_name_),
-                        "name of the video file to process")
+                ("video_path", po::value<string>(&video_path_),
+                        "absolute path of the video file to process")
                 ("out_path", po::value<string>(&out_path_),
                  "absolute path to save all output to")
-                ("in_path", po::value<string>(&in_path_),
-                        "absolute path to the input artifacts: video.mov, deepsea_class_map.json and deepsea_cfg.jsonfiles")
+                ("cfg_path", po::value<string>(&cfg_path_),
+                 "absolute path to the configuration artifacts: deepsea_class_map.json and deepsea_cfg.json files")
                 ("xml_path", po::value<string>(&xml_path_),
                  "absolute path to directory with voc xml files. If absent, --address and --topic must be set")
                 ("address", po::value<string>(&address_),
@@ -68,21 +68,31 @@ namespace deepsea {
         }
         bool failure = this->detection_options(vm);
 
-        if (vm.count("in_path")) {
-            if (stat (in_path_.c_str(), &buffer) != 0) {
-                cout << "Directory " << in_path_ << " does not exist" << endl;
+        if (vm.count("cfg_path")) {
+            if (stat (cfg_path_.c_str(), &buffer) != 0) {
+                cout << "Directory " << cfg_path_ << " does not exist" << endl;
                 failure = true;
             }
             else {
-                cout << "Input path was set to " << in_path_ << endl;
+                cout << "Configuration path was set to " << cfg_path_ << endl;
+                string filename = cfg_path_ + "deepsea_class_map.json";
+                if (stat (filename.c_str(), &buffer) != 0) {
+                    cout << filename << " does not exist";
+                    failure = true;
+                }
+                filename = cfg_path_ + "deepsea_cfg.json";
+                if (stat (filename.c_str(), &buffer) != 0) {
+                    cout << filename << " does not exist";
+                    failure = true;
+                }
             }
         }
         else {
             cout << "Input path must be set with --in_path" << endl;
             failure = true;
         }
-        if (vm.count("video_name")) {
-            string video_path =  this->in_path_ + "/" + this->video_name_;
+        if (vm.count("video_path")) {
+            string video_path =  this->video_path_;
             if (stat (video_path.c_str(), &buffer) != 0) {
                 cout << video_path << " does not exist";
                 failure = true;
@@ -91,7 +101,7 @@ namespace deepsea {
                 cout << "Video to process was set to " << video_path << endl;
             }
         } else {
-            cout << "Must set the video_name with --video_name and input with --input_path" << endl;
+            cout << "Must set the video_path with --video_path" << endl;
             failure = true;
         }
         if (vm.count("out_path")) {

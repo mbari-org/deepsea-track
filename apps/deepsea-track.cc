@@ -52,7 +52,7 @@ int main( int argc, char** argv ) {
     int frame_num;
     Mat frame, frame_enhanced, frame_resized;
     ConfigMaps cfg_map;
-    VideoCapture cap(args.in_path_ + "/" + args.video_name_);
+    VideoCapture cap(args.video_path_);
     int width  = cap.get(CAP_PROP_FRAME_WIDTH);
     int height = cap.get(CAP_PROP_FRAME_HEIGHT);
     float fps = cap.get(CAP_PROP_FPS);
@@ -70,9 +70,9 @@ int main( int argc, char** argv ) {
     //////////////////////////////////////////////////////////
     // get configuration
     cout << "Parsing configuration deepsea_class_map.json" << endl;
-    assert(initConfigMaps(args.in_path_ + "deepsea_class_map.json", cfg_map));
+    assert(initConfigMaps(args.cfg_path_ + "deepsea_class_map.json", cfg_map));
     cout << "Parsing configuration deepsea_cfg.json" << endl;
-    Config cfg(args.in_path_ + "deepsea_cfg.json");
+    Config cfg(args.cfg_path_ + "deepsea_cfg.json");
     assert(cfg.isInitialized());
     Logger log(cfg, frame_num, args.out_path_);
     VisualEventManager manager(cfg, cfg_map);
