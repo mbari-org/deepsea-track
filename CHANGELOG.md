@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+# [1.9.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.8.0...v1.9.0) (2021-05-24)
+
+
+### Features
+
+* split configuration and video input into separate arguments ([f695694](http://bitbucket.org/mbari/deepsea-track/commits/f6956941b20fc74d2dfc39f9fe9c6d84a86cf1d2))
+
 # [1.8.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.7.0...v1.8.0) (2021-04-14)
 
 
