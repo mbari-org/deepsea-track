@@ -88,7 +88,7 @@ namespace deepsea {
             }
         }
         else {
-            cout << "Input path must be set with --in_path" << endl;
+            cout << "Configuration path must be set with --cfg_path" << endl;
             failure = true;
         }
         if (vm.count("video_path")) {
