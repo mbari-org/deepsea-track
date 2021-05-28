@@ -215,7 +215,7 @@ e.g. this uses the MEDIANFLOW tracker and drops the second tracker:
   "min_event_frames": 3,
   "display": false,
   "display_wait_msecs": 2000,
-  "detector_wait_msecs": 10
+  "tracker_wait_msecs": 10
 }
 ```
 e.g. this uses a combined MEDIANFLOW and KCF tracker:
@@ -227,7 +227,7 @@ e.g. this uses a combined MEDIANFLOW and KCF tracker:
   "min_event_frames": 3,
   "display": false,
   "display_wait_msecs": 2000,
-  "detector_wait_msecs": 10
+  "tracker_wait_msecs": 10
 }
 ```
 
