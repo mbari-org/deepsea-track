@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+# [1.10.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.9.3...v1.10.0) (2021-05-28)
+
+
+### Features
+
+* added tracker delay and delay to zmq initialize wait message block ([89bb3f0](http://bitbucket.org/mbari/deepsea-track/commits/89bb3f07fb7ac84bbfc7688efff9e37744578295))
+
 ## [1.9.3](http://bitbucket.org/mbari/deepsea-track/compare/v1.9.2...v1.9.3) (2021-05-26)
 
 
