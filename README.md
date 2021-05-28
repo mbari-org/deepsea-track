@@ -12,7 +12,6 @@ It is designed to be used with output from object detection models sent over [Ze
 It generates unique *VisualEvent* track sequences in JSON format.
 
 ---
-Documentation for this is available at http://docs.mbari.org/deepsea-track
 
 [click image below to see example in YouTube]
 [![Example video output](https://img.youtube.com/vi/cMZ8vr0aAYI/maxresdefault.jpg)](https://youtu.be/cMZ8vr0aAYI)
@@ -213,7 +212,10 @@ e.g. this uses the MEDIANFLOW tracker and drops the second tracker:
 {
   "tracker1": 0,
   "tracker2": -1,
-  "min_event_frames": 3
+  "min_event_frames": 3,
+  "display": false,
+  "display_wait_msecs": 2000,
+  "detector_wait_msecs": 10
 }
 ```
 e.g. this uses a combined MEDIANFLOW and KCF tracker:
@@ -222,14 +224,22 @@ e.g. this uses a combined MEDIANFLOW and KCF tracker:
 {
   "tracker1": 0,
   "tracker2": 1,
-  "min_event_frames": 3
+  "min_event_frames": 3,
+  "display": false,
+  "display_wait_msecs": 2000,
+  "detector_wait_msecs": 10
 }
 ```
 
 | field   | description           |
 |----------|---------------|
 | tracker1 | The primary tracker - must be a valid id  |
-| tracker2 | Optional secondary tracker - can be -1 or No tracker  |
+| tracker2 | Optional secondary tracker - can be -1 for *no* second tracker  |
+| tracker_wait_msecs |  The time in milliseconds to pause between running the tracker on each frame; useful if detector messages are slow over zmq |
+| display | Set True to see the frame output displayed while running |
+| display_wait_msecs | The time in milliseconds to wait to while displaying the frame output |
+| min_event_frames | Only VisualEvents greater than this number of frames are stored; used to remove short invalid tracks |
+
 
 # Building
 

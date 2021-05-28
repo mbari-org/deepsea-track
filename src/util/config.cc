@@ -13,6 +13,7 @@ namespace deepsea {
         tracker_cfg_.type2 = j.at("tracker2").get<TrackerType>();
         j.at("min_event_frames").get_to(tracker_cfg_.min_event_frames);
         j.at("display_wait_msecs").get_to((display_wait_msecs_));
+        j.at("tracker_wait_msecs").get_to((tracker_wait_msecs_));
         j.at("display").get_to((display_));
     }
 
@@ -52,6 +53,7 @@ namespace deepsea {
     Config::Config(std::string filename) {
         init_ = false;
         display_wait_msecs_ = 250;
+        tracker_wait_msecs_ = 100;
         display_ = true;
         std::ifstream fin(filename);
         try {
@@ -79,6 +81,7 @@ namespace deepsea {
         this->tracker_cfg_ = cfg.tracker_cfg_;
         this->program_info_ = cfg.program_info_;
         this->display_wait_msecs_ = cfg.display_wait_msecs_;
+        this->tracker_wait_msecs_ = cfg.tracker_wait_msecs_;
         this->display_ = cfg.display_;
         return *this;
     }
