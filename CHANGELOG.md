@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+# [1.11.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.10.0...v1.11.0) (2021-05-31)
+
+
+### Features
+
+* added zmq message tracker delay ([be8a424](http://bitbucket.org/mbari/deepsea-track/commits/be8a4240fa176ea5142d533b4836a1cb3c857e1b))
+
 # [1.10.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.9.3...v1.10.0) (2021-05-28)
 
 
