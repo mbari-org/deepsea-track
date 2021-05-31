@@ -23,6 +23,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <unistd.h>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <nlohmann/json.hpp>
@@ -56,6 +57,7 @@ int main( int argc, char** argv ) {
     int width  = cap.get(CAP_PROP_FRAME_WIDTH);
     int height = cap.get(CAP_PROP_FRAME_HEIGHT);
     float fps = cap.get(CAP_PROP_FPS);
+    int zmq_delay_microsecs = 5*1e6; // 5 seconds
     float resize_factor_width = float(args.resize_width_) / float(width);
     float resize_factor_height = float(args.resize_height_) / float(height);
     if (args.start_frame_num_ > 1)
@@ -107,9 +109,11 @@ int main( int argc, char** argv ) {
         cout << "====================== Processing frame " << frame_num << "====================== " << endl;
 
         // if loading detections over zmq, wait for start
-        if (zmq.initialized()) while (!zmq.started()) {
+        if (zmq.initialized())
+            while (!zmq.started()) {
                 cout << "waiting for zmq messages to  start" << endl;
-            };
+                usleep(zmq_delay_microsecs);
+            }
 
         list<EventObject> event_objs;
         list<VOCObject> voc_objs;
@@ -202,6 +206,13 @@ int main( int argc, char** argv ) {
 
         frame_num +=1;
         voc_objs.clear();
+
+        // only pause if current frame is beyond the frame from the last message
+        if (cfg.trackerWait() > 0 && frame_num > zmq.lastFrameNum()) {
+            cout << "====================== Pausing tracker " << cfg.trackerWait() << " msecs ====================== " << endl;
+            usleep(cfg.trackerWait() * 1000);
+        }
+
         if (zmq.initialized())
             zmq.cleanUp(frame_num);
     }

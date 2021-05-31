@@ -17,6 +17,7 @@ namespace deepsea {
             initialized_(false),
             address_(address),
             topic_(topic),
+            last_frame_num_(-1),
             resize_factor_width_(resize_factor_width),
             resize_factor_height_(resize_factor_height){
         // rudimentary check for populated address/topic; todo: add check for correct protocol
@@ -81,13 +82,14 @@ namespace deepsea {
                                 string class_name = vocs[i]["class_name"];
                                 string score = vocs[i]["class_score"]; class_score = std::stof(score);
                                 string frame_num = vocs[i]["frame_num"];
+                                this->last_frame_num_ = std::stoi(frame_num);
                                 // rescale and store in EventObject
                                 Rect box = Rect(int(resize_factor_width_*xmin),
                                         int(resize_factor_height_*ymin),
                                         int(resize_factor_width_*(xmax - xmin)),
                                         int(resize_factor_height_*(ymax - ymin)));
                                 VOCObject v(class_name, class_score, box);
-                                objects_.push_back(EventObject(v, 0, std::stoi(frame_num)));
+                                objects_.push_back(EventObject(v, 0, this->last_frame_num_));
                             }
                         }
                     }
@@ -133,4 +135,8 @@ namespace deepsea {
         return this->initialized_;
     }
 
+// ######################################################################
+    int ZMQListener::lastFrameNum() {
+        return this->last_frame_num_;
+    }
 }

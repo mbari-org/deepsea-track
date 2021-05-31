@@ -51,11 +51,15 @@ namespace deepsea {
 
         bool initialized();
 
+        // Frame number of the last message received
+        int lastFrameNum();
+
     private:
 
         list<EventObject> objects_;
         string address_;
         string topic_;
+        int last_frame_num_;
         bool stopped_;
         bool started_;
         bool initialized_;
