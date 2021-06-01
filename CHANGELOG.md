@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+# [1.13.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.12.0...v1.13.0) (2021-06-01)
+
+
+### Features
+
+* added configuration of nms and score thresholds to tracker ([9286dfc](http://bitbucket.org/mbari/deepsea-track/commits/9286dfc9337e322b66d81b5638086711b4def5d3))
+
 # [1.12.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.11.0...v1.12.0) (2021-06-01)
 
 
