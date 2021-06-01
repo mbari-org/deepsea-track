@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+## [1.13.1](http://bitbucket.org/mbari/deepsea-track/compare/v1.13.0...v1.13.1) (2021-06-01)
+
+
+### Bug Fixes
+
+* zmq boxes normalized to 0-1 float ([b713c87](http://bitbucket.org/mbari/deepsea-track/commits/b713c87d7ced29d868291890d2c14560d23a2e3d))
+
 # [1.13.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.12.0...v1.13.0) (2021-06-01)
 
 
