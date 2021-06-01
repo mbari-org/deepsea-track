@@ -11,6 +11,8 @@ namespace deepsea {
     void Config::from_json(const nlohmann::json &j) {
         tracker_cfg_.type1 = j.at("tracker1").get<TrackerType>();
         tracker_cfg_.type2 = j.at("tracker2").get<TrackerType>();
+        tracker_cfg_.score_threshold = j.at("score_threshold").get<TrackerType>();
+        tracker_cfg_.nms_threshold = j.at("nms_threshold").get<TrackerType>();
         j.at("min_event_frames").get_to(tracker_cfg_.min_event_frames);
         j.at("display_wait_msecs").get_to((display_wait_msecs_));
         j.at("tracker_wait_msecs").get_to((tracker_wait_msecs_));

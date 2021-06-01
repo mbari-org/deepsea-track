@@ -244,7 +244,8 @@ e.g. this uses a combined MEDIANFLOW and KCF tracker:
 | display | Set True to see the frame output displayed while running |
 | display_wait_msecs | The time in milliseconds to wait to while displaying the frame output |
 | min_event_frames | Only VisualEvents greater than this number of frames are stored; used to remove short invalid tracks |
-
+| nms_threshold | The minimum score for the non maximum supression algorithm.  If nms_threshold is set too low, e.g. 0.1, it will not detect overlapping objects of same or different classes; set too high e.g. 1, will return multiple boxes for the same object. |
+| score_threshold | The minimum score for detections |
 
 # Building
 

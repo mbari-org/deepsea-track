@@ -61,13 +61,7 @@ namespace deepsea {
             vector_vob.push_back(*itvoc);
         }
 
-        // if nms_threshold is set too low, e.g. 0.1, it will not detect overlapping objects
-        // of same or different classes. But if it is set too high e.g. 1,
-        // then you get multiple boxes for the same object.
-        // TODO: move into the config file
-        float score_threshold = 0.6;
-        float nms_threshold = 0.4;
-        NMSBoxes(boxes, scores, score_threshold, nms_threshold, indices);
+        NMSBoxes(boxes, scores, cfg_.getTracker().score_threshold, cfg_.getTracker().nms_threshold, indices);
 
         for (size_t i = 0; i < indices.size(); ++i) {
             int idx = indices[i];

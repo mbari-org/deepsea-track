@@ -59,6 +59,8 @@ namespace deepsea {
 
         struct TrackerConfig {
             int min_event_frames;
+            float score_threshold;             //! minimum score of any detection to be considered as a seed for a visual event
+            float nms_threshold;               //! minimum non maximum suppression score to detect overlapping objects
             TrackerType type1;
             TrackerType type2;
         };

@@ -3,6 +3,8 @@
   "tracker2": 1,
   "min_event_frames": 1,
   "display_wait_msecs": 2000,
-  "tracker_wait_msecs": 0,
-  "display": true
+  "tracker_wait_msecs": 1000,
+  "display": true,
+  "nms_threshold": 0.4,
+  "score_threshold": 0.4
 }
