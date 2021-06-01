@@ -62,7 +62,7 @@ namespace deepsea {
                 cout << "Listening for visual events topic " << topic_ << " on " << address_ << endl;
                 auto res = subscriber.recv(msg, zmq::recv_flags::none);
                 string s = string(static_cast<char*>(msg.data()), msg.size());
-                int xmin, xmax, ymin, ymax;
+                float xmin, xmax, ymin, ymax;
                 float class_score;
                 string class_name;
                 if(s == topic_) {
