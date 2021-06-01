@@ -30,8 +30,8 @@ namespace deepsea {
 
     public:
         ZMQListener(const string address, const string topic,
-                    const float resize_factor_width_,
-                    const float resize_factor_height);
+                    const float tracker_width,
+                    const float tracker_height);
 
         ~ZMQListener();
 
@@ -63,7 +63,7 @@ namespace deepsea {
         bool stopped_;
         bool started_;
         bool initialized_;
-        float resize_factor_height_;
-        float resize_factor_width_;
+        float tracker_height_;
+        float tracker_width_;
     };
 }

@@ -46,8 +46,8 @@ namespace deepsea {
         static double iou(const Rect_<float> bb1, const Rect_<float> bb2);
 
         /// \brief rescales bounding box
-        /// \param resize_factor_width factor between 0-1 to rescale width
-        /// \param resize_factor_height factor between 0-1 to rescale height
+        /// \param resize_factor_width factor to rescale width
+        /// \param resize_factor_height factor to rescale height
         /// \param bbox
         /// \return scaled bounding box
         static Rect2d rescale(float resize_factor_width, float resize_factor_height, const Rect2d &bbox);

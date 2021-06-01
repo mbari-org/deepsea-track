@@ -37,10 +37,14 @@ namespace deepsea {
                 ("help", "produce help message")
                 ("start_frame_num", po::value<unsigned int>(&start_frame_num_)->default_value(0),
                         "starting frame to process, e.g. --start_frame=0 is the first frame in the video")
-                ("resize_width", po::value<unsigned int>(&resize_width_)->default_value(512),
+                ("tracker_width", po::value<unsigned int>(&tracker_width_)->default_value(512),
                         "resize width in pixels for running the tracker")
-                ("resize_height", po::value<unsigned int>(&resize_height_)->default_value(512),
+                ("tracker_height", po::value<unsigned int>(&tracker_height_)->default_value(512),
                         "resize width in pixels for running the tracker")
+                ("out_width", po::value<unsigned int>(&out_width_)->default_value(1920),
+                 "width in pixels the JSON output should be scaled to")
+                ("out_height", po::value<unsigned int>(&out_height_)->default_value(1080),
+                 "width in pixels the JSON output should be scaled to")
                 ("stride", po::value<unsigned int>(&stride_)->default_value(1),
                         "stride in detections, 1-based. e.g. --stride=5 will skip ip seeding new events to every 5th detection")
                 ("video_path", po::value<string>(&video_path_),
@@ -118,8 +122,11 @@ namespace deepsea {
         }
         cout << "Start processing frame " << start_frame_num_ << endl;
 
-        if (vm.count("resize_width") && vm.count("resize_height")) {
-            cout << "Resizing to " << resize_width_ << "x" << resize_height_ << endl;
+        if (vm.count("tracker_width_") && vm.count("tracker_height_")) {
+            cout << "Tracking size to " << tracker_width_ << "x" << tracker_height_ << endl;
+        }
+        if (vm.count("out_width_") && vm.count("out_height_")) {
+            cout << "JSON output will be scaled to " << out_width_ << "x" << out_height_ << endl;
         }
         if (vm.count("stride")) {
             cout << "Skipping every " << stride_ << " frame" << endl;

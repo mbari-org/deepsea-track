@@ -68,12 +68,20 @@ namespace deepsea {
     }
 
 // reads .xml for values in <object> ... </object>
-    void getObjectValues(XercesDOMParser *itsParser, list<VOCObject> &obj_list, ConfigMaps &cfg) {
+    void getObjectValues(XercesDOMParser *itsParser, list<VOCObject> &obj_list, ConfigMaps &cfg, int &width, int &height) {
         DOMNodeList *list = NULL;
         DOMDocument *domDocParser = itsParser->getDocument();
 
-        // Hhow many instances of the '<tag>' found
-        XMLCh *source = XMLString::transcode("object");        // Tag wanted
+        XMLCh *source = XMLString::transcode("width");
+        list = domDocParser->getElementsByTagName(source);
+        width = stof(XMLString::transcode(list->item(0)->getTextContent()));
+
+        source = XMLString::transcode("height");
+        list = domDocParser->getElementsByTagName(source);
+        height = stof(XMLString::transcode(list->item(0)->getTextContent()));
+
+        // How many instances of the '<tag>' found
+        source = XMLString::transcode("object");        // Tag wanted
         list = domDocParser->getElementsByTagName(source);        // Returns list of '<tag>' found
 
         // parse through each object to grab values
@@ -124,7 +132,8 @@ namespace deepsea {
                         break;
                     } else if (tag_name == "name") {
                         tmp_object.setName(tag_value);
-                        tmp_object.setIndex(cfg.class_ids[tag_value]);
+                        if (cfg.class_ids.size() > 0)
+                            tmp_object.setIndex(cfg.class_ids[tag_value]);
                     } else if (tag_name == "confidence") {
                         // convert Confidence value from 'string to double'
                         istringstream is(tag_value);

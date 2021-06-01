@@ -10,16 +10,16 @@ namespace deepsea {
 
 // ######################################################################
     ZMQListener::ZMQListener(const string address, const string topic,
-                            const float resize_factor_width,
-                            const float resize_factor_height):
+                            const float tracker_width,
+                            const float tracker_height):
             stopped_(false),
             started_(false),
             initialized_(false),
             address_(address),
             topic_(topic),
             last_frame_num_(-1),
-            resize_factor_width_(resize_factor_width),
-            resize_factor_height_(resize_factor_height){
+            tracker_width_(tracker_width),
+            tracker_height_(tracker_height){
         // rudimentary check for populated address/topic; todo: add check for correct protocol
         if (address.length() > 0 and topic.length() > 0)
             initialized_ = true;
@@ -75,19 +75,19 @@ namespace deepsea {
                         cout << vocs.size() << endl;
                         for (int i=0; i < vocs.size(); i++) {
                             if (vocs[i].is_object()) {
-                                string xmn = vocs[i]["xmin"]; xmin = std::stoi(xmn);
-                                string xmx = vocs[i]["xmax"]; xmax = std::stoi(xmx);
-                                string ymn = vocs[i]["ymin"]; ymin = std::stoi(ymn);
-                                string ymx = vocs[i]["ymax"]; ymax = std::stoi(ymx);
+                                string xmn = vocs[i]["xmin"]; xmin = std::stof(xmn);
+                                string xmx = vocs[i]["xmax"]; xmax = std::stof(xmx);
+                                string ymn = vocs[i]["ymin"]; ymin = std::stof(ymn);
+                                string ymx = vocs[i]["ymax"]; ymax = std::stof(ymx);
                                 string class_name = vocs[i]["class_name"];
                                 string score = vocs[i]["class_score"]; class_score = std::stof(score);
                                 string frame_num = vocs[i]["frame_num"];
                                 this->last_frame_num_ = std::stoi(frame_num);
                                 // rescale and store in EventObject
-                                Rect box = Rect(int(resize_factor_width_*xmin),
-                                        int(resize_factor_height_*ymin),
-                                        int(resize_factor_width_*(xmax - xmin)),
-                                        int(resize_factor_height_*(ymax - ymin)));
+                                Rect box = Rect(int(tracker_width_*xmin),
+                                        int(tracker_height_*ymin),
+                                        int(tracker_width_*(xmax - xmin)),
+                                        int(tracker_height_*(ymax - ymin)));
                                 VOCObject v(class_name, class_score, box);
                                 objects_.push_back(EventObject(v, 0, this->last_frame_num_));
                             }

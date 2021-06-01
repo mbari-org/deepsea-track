@@ -50,8 +50,10 @@ namespace deepsea {
         unsigned int start_frame_num_;   ///! starting frame; used only during startup
         string video_path_;              ///! absolute path to the video file
         string cfg_path_;                ///! absolute path to the configuration files: deepsea_class_map.json and deepsea_cfg.json
-        unsigned int resize_width_;      ///! resize width in pixels for resizing the video before running the tracker
-        unsigned int resize_height_;     ///! resize hight in pixels for resizing the video before running the tracker
+        unsigned int tracker_width_;     ///! width in pixels to resize the video before running the tracker
+        unsigned int tracker_height_;    ///! height in pixels to resize the video before running the tracker
+        unsigned int out_width_;         ///! width in pixels the output should be scaled to
+        unsigned int out_height_;        ///! height in pixels the output should be scaled to
         unsigned int stride_;            ///! stride in detections, 1-based. e.g. --stride=5 will skip seeding new events to every 5th detection
         string topic_;                   ///! topic to listen on at address, e.g. VisualEvents
         string address_;                 ///! socket address for the detector output, e.g. tcp://127.0.0.1:6432

@@ -73,8 +73,10 @@ docker run mbari/deepsea-track --help
   * --xml_path (optional) absolute path to directory with voc xml files. If absent, --address and --topic must be set
   * --address (optional) socket address for the detector output, e.g. tcp://127.0.0.1:6432
   * --topic (optional) topic to listen on at address, e.g. VisualEvents. If specified, must also specify the --address 
-  * --resize_width resize width in pixels for running the tracker, defaults to 512
-  * --resize_height resize height in pixels for running the tracker, defaults to 512
+  * --tracker_width resize width in pixels for running the tracker, defaults to 512
+  * --tracker_height resize height in pixels for running the tracker, defaults to 512 
+  * --out_width width in pixels to scale the output to, defaults to 1920
+  * --out_height height in pixels to scale the output to, defaults to 1080
   * --start_frame_num (optional) starting frame to process, 1-based. e.g. --start_frame=1 is the first frame in the video. Defaults to 1.
   * --stride (optional) amount to stride seeding new detection between frames. A larger stride may process faster. Defaults to 1.
   
@@ -93,8 +95,11 @@ e.g.
 - output results to mapped /data mount in the directory /data/benthic_tracks
 - *no start frame specified - start at frame 1*
 - *no stride specified - process every frame*
-- *no resize_width specified - default to 512*
-- *no resize_height specified - default to 512*
+- *no tracker_width specified - default to 512*
+- *no tracker_height specified - default to 512*
+- *no out_width specified - default to 1920*
+- *no out_height specified - default to 1080*
+
 
 ```
 docker run -it --rm -v $PWD:/data mbari/deepsea-track --video_path /data/benthic/video.mp4 --cfg_path /data/benthic/ --xml_path /data/benthic --out_path /data/benthic_tracks/

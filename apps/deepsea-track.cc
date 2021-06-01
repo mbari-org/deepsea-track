@@ -54,19 +54,23 @@ int main( int argc, char** argv ) {
     Mat frame, frame_enhanced, frame_resized;
     ConfigMaps cfg_map;
     VideoCapture cap(args.video_path_);
-    int width  = cap.get(CAP_PROP_FRAME_WIDTH);
-    int height = cap.get(CAP_PROP_FRAME_HEIGHT);
+    int frame_width  = cap.get(CAP_PROP_FRAME_WIDTH);
+    int frame_height = cap.get(CAP_PROP_FRAME_HEIGHT);
     float fps = cap.get(CAP_PROP_FPS);
     int zmq_delay_microsecs = 5*1e6; // 5 seconds
-    float resize_factor_width = float(args.resize_width_) / float(width);
-    float resize_factor_height = float(args.resize_height_) / float(height);
+    float tracker_width = float(args.tracker_width_) ;
+    float tracker_height = float(args.tracker_height_) ;
+    float resize_frame_factor_width = float(frame_width) / float(args.tracker_width_) ;
+    float resize_frame_factor_height = float(frame_height) / float(args.tracker_height_) ;
+    float resize_out_factor_width = float(args.out_width_) / float(args.tracker_width_) ;
+    float resize_out_factor_height = float(args.out_height_) / float(args.tracker_height_) ;
     if (args.start_frame_num_ > 1)
         cap.set(CAP_PROP_POS_FRAMES, args.start_frame_num_);
     frame_num = args.start_frame_num_;
     VideoWriter out(args.out_path_ + "results.mp4",
                     VideoWriter::fourcc('H', '2', '6', '4'),
-                    fps, Size(width, height));
-    Size scaled_size(Size(args.resize_width_, args.resize_height_));
+                    fps, Size(frame_width, frame_height));
+    Size scaled_size(Size(tracker_width, tracker_height));
     Preprocess pre(scaled_size, 3, args.video_path_);
 
     //////////////////////////////////////////////////////////
@@ -93,7 +97,7 @@ int main( int argc, char** argv ) {
     }
     //////////////////////////////////////////////////////////
     // if loading detections over zmq, launch thread as daemon to listen for events
-    ZMQListener zmq(args.address_, args.topic_, resize_factor_width, resize_factor_height);
+    ZMQListener zmq(args.address_, args.topic_, tracker_width, tracker_height);
     thread zmqThread = thread();
     if (zmq.initialized()) {
         thread zmqThread(&ZMQListener::listen, &zmq);
@@ -117,6 +121,7 @@ int main( int argc, char** argv ) {
 
         list<EventObject> event_objs;
         list<VOCObject> voc_objs;
+        int voc_width, voc_height;
         if (frame_num == args.start_frame_num_ || (frame_num % args.stride_) == 0) {
 
             // if have voc formatted xml, read detections from files
@@ -126,15 +131,17 @@ int main( int argc, char** argv ) {
 
                 if (Utils::doesPathExist(xml_filename)) {
                     parser->parse(xml_filename.c_str());
-                    getObjectValues(parser, voc_objs, cfg_map);
+                    getObjectValues(parser, voc_objs, cfg_map, voc_width, voc_height);
+                    float width_factor = float(tracker_width / voc_width);
+                    float height_factor = float(tracker_height / voc_height);
                     // rescale and store VOCObjects in VisualObjects
                     list<VOCObject>::iterator itvoc;
                     for (itvoc = voc_objs.begin(); itvoc != voc_objs.end(); ++itvoc) {
                         Rect2d  r = (*itvoc).getBox();
-                        r.x = int(r.x * resize_factor_width);
-                        r.y = int(r.y * resize_factor_height);
-                        r.width = int(r.width * resize_factor_width);
-                        r.height = int(r.height * resize_factor_height);
+                        r.x = int(r.x * width_factor);
+                        r.y = int(r.y * height_factor);
+                        r.width = int(r.width * width_factor);
+                        r.height = int(r.height * height_factor);
                         (*itvoc).setBox(r);
                         EventObject o((*itvoc), 0, frame_num);
                         event_objs.push_back(o);
@@ -147,7 +154,7 @@ int main( int argc, char** argv ) {
         }
 
         double timer = (double)getTickCount();
-        resize(frame, frame_resized, Size(), resize_factor_width, resize_factor_height);
+        resize(frame, frame_resized, Size(), 1. / resize_frame_factor_width, 1. / resize_frame_factor_height);
 
         // enhance
         frame_enhanced = pre.update(frame_resized);
@@ -160,7 +167,7 @@ int main( int argc, char** argv ) {
         list<VisualEvent *> events = manager.getEvents(frame_num);
 
         // log to json
-        log.save(events, frame_num, resize_factor_width, resize_factor_height);
+        log.save(events, frame_num, resize_out_factor_width, resize_out_factor_height);
 
         if (cfg.display()) {
             list<VisualEvent *>::iterator itve;
@@ -174,7 +181,7 @@ int main( int argc, char** argv ) {
 
                 // rescale boxes if tracking on reduced frame size
                 Rect2d bbox = evt_obj.getBboxTracker();
-                Rect2d bbox_tracker = Utils::rescale(resize_factor_width, resize_factor_height, bbox);
+                Rect2d bbox_tracker = Utils::rescale(resize_frame_factor_width, resize_frame_factor_height, bbox);
 
                 // descriptive information for the frame overlay
                 uuids::uuid id = (*itve)->getUUID();
@@ -194,7 +201,7 @@ int main( int argc, char** argv ) {
             }
 
             string msg = cv::format("FPS: %2.4f frame: %06d", fps, frame_num);
-            putText(frame, msg.c_str(), Point(int(0.025 * width), int(0.025 * height)),
+            putText(frame, msg.c_str(), Point(int(0.025 * frame_width), int(0.025 * frame_height)),
                     FONT_HERSHEY_SIMPLEX, 0.5, Scalar(53, 200, 243), 1);
             imshow("track", frame);
             imshow("enhanced", frame_enhanced);
