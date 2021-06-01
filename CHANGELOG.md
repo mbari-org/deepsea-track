@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+# [1.12.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.11.0...v1.12.0) (2021-06-01)
+
+
+### Features
+
+* added output scaling and better renaming to distinguish resize ([4145dd0](http://bitbucket.org/mbari/deepsea-track/commits/4145dd03f78a5fb42e200c4059ac228eea3abeb9))
+
 # [1.11.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.10.0...v1.11.0) (2021-05-31)
 
 
