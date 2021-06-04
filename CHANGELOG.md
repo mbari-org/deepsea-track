@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+# [1.14.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.13.1...v1.14.0) (2021-06-04)
+
+
+### Features
+
+* added option to create video and prefix with video file stem ([e6fe3ab](http://bitbucket.org/mbari/deepsea-track/commits/e6fe3ab37b1fc8670d993b2c06e6662992b38e67))
+
 ## [1.13.1](http://bitbucket.org/mbari/deepsea-track/compare/v1.13.0...v1.13.1) (2021-06-01)
 
 
