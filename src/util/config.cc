@@ -17,6 +17,7 @@ namespace deepsea {
         j.at("display_wait_msecs").get_to((display_wait_msecs_));
         j.at("tracker_wait_msecs").get_to((tracker_wait_msecs_));
         j.at("display").get_to((display_));
+        j.at("create_video").get_to((create_video_));
     }
 
     void Config::to_json(nlohmann::json &j, const Config &p) {
@@ -57,6 +58,7 @@ namespace deepsea {
         display_wait_msecs_ = 250;
         tracker_wait_msecs_ = 100;
         display_ = true;
+        create_video_ = false;
         std::ifstream fin(filename);
         try {
             nlohmann::json j = nlohmann::json::parse(fin);
@@ -85,6 +87,7 @@ namespace deepsea {
         this->display_wait_msecs_ = cfg.display_wait_msecs_;
         this->tracker_wait_msecs_ = cfg.tracker_wait_msecs_;
         this->display_ = cfg.display_;
+        this->create_video_ = cfg.create_video_;
         return *this;
     }
 

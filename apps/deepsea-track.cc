@@ -24,6 +24,7 @@
 #include <string>
 #include <thread>
 #include <unistd.h>
+#include <boost/filesystem.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <nlohmann/json.hpp>
@@ -36,6 +37,7 @@
 #include <deepsea/zmq_listener.h>
 #include <deepsea/arguments.h>
 
+using namespace boost;
 using namespace cv;
 using namespace std;
 using namespace deepsea;
@@ -67,7 +69,9 @@ int main( int argc, char** argv ) {
     if (args.start_frame_num_ > 1)
         cap.set(CAP_PROP_POS_FRAMES, args.start_frame_num_);
     frame_num = args.start_frame_num_;
-    VideoWriter out(args.out_path_ + "results.mp4",
+    stringstream ss;
+    ss << boost::format("%s/%s_results.mp4") % args.out_path_ % filesystem::path(args.video_path_).stem().c_str();
+    VideoWriter out(ss.str(),
                     VideoWriter::fourcc('H', '2', '6', '4'),
                     fps, Size(frame_width, frame_height));
     Size scaled_size(Size(tracker_width, tracker_height));
@@ -169,7 +173,7 @@ int main( int argc, char** argv ) {
         // log to json
         log.save(events, frame_num, resize_out_factor_width, resize_out_factor_height);
 
-        if (cfg.display()) {
+        if (cfg.display() || cfg.createVideo()) {
             list<VisualEvent *>::iterator itve;
             for (itve = events.begin(); itve != events.end(); ++itve) {
 
@@ -203,12 +207,16 @@ int main( int argc, char** argv ) {
             string msg = cv::format("FPS: %2.4f frame: %06d", fps, frame_num);
             putText(frame, msg.c_str(), Point(int(0.025 * frame_width), int(0.025 * frame_height)),
                     FONT_HERSHEY_SIMPLEX, 0.5, Scalar(53, 200, 243), 1);
-            imshow("track", frame);
-            imshow("enhanced", frame_enhanced);
-            out.write(frame);
+            if (cfg.display()) {
+                imshow("track", frame);
+                imshow("enhanced", frame_enhanced);
+                if (waitKey(cfg.displayWait()) == 27) // quit on ESC button
+                    break;
+            }
 
-            if (waitKey(cfg.displayWait()) == 27) // quit on ESC button
-                break;
+            if (cfg.createVideo())
+                out.write(frame);
+
         }
 
         frame_num +=1;

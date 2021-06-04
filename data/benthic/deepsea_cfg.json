@@ -5,6 +5,7 @@
   "display_wait_msecs": 2000,
   "tracker_wait_msecs": 0,
   "display": true,
+  "create_video": true,
   "nms_threshold": 0.4,
   "score_threshold": 0.4
 }
