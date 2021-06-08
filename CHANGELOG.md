@@ -1,5 +1,17 @@
 # DeepSea Track Changelog
 
+# [1.15.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.14.0...v1.15.0) (2021-06-08)
+
+
+### Bug Fixes
+
+* pass through float instead of TrackerType for score and nms ([adbcbe5](http://bitbucket.org/mbari/deepsea-track/commits/adbcbe59ff2d3ab81ab2062c7ce5302aa974e08a))
+
+
+### Features
+
+* only short first 7 characters of uuid for brevity and print exact path to cfg ([12ceaf9](http://bitbucket.org/mbari/deepsea-track/commits/12ceaf9beff786917853c1745607dafb0c3f3e29))
+
 # [1.14.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.13.1...v1.14.0) (2021-06-04)
 
 
