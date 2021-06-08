@@ -79,9 +79,9 @@ int main( int argc, char** argv ) {
 
     //////////////////////////////////////////////////////////
     // get configuration
-    cout << "Parsing configuration deepsea_class_map.json" << endl;
+    cout << "Parsing configuration " << args.cfg_path_ << "deepsea_class_map.json" << endl;
     assert(initConfigMaps(args.cfg_path_ + "deepsea_class_map.json", cfg_map));
-    cout << "Parsing configuration deepsea_cfg.json" << endl;
+    cout << "Parsing configuration" << args.cfg_path_ << "deepsea_cfg.json" << endl;
     Config cfg(args.cfg_path_ + "deepsea_cfg.json");
     assert(cfg.isInitialized());
     Logger log(cfg, frame_num, args.out_path_);
@@ -189,6 +189,10 @@ int main( int argc, char** argv ) {
 
                 // descriptive information for the frame overlay
                 uuids::uuid id = (*itve)->getUUID();
+                string uuid = boost::uuids::to_string(id);
+                string delimiter = "-";
+                string id_str = uuid.c_str();
+                string short_uuid = id_str.substr(0, 7);
                 Scalar color = cfg_map.class_colors[evt_obj.getClassIndex()];
                 string class_name;
                 // use class description if available
@@ -198,10 +202,9 @@ int main( int argc, char** argv ) {
                     class_name = evt_obj.getClassName();
 
                 // overlay box and prediction
-                string uuid = boost::uuids::to_string(id);
                 string description = class_name;//format("%s,%4.2f,%4.2f", class_name.c_str(), vo.bbox_tracker_.x, vo.bbox_tracker_.y);
                 //string description = cv::format("%s,%g", class_name.c_str(), vo.surprise_);
-                Utils::decorate(frame, bbox_tracker, color, uuid.c_str(), class_name, 1, 0.7);
+                Utils::decorate(frame, bbox_tracker, color, short_uuid, class_name, 1, 0.7);
             }
 
             string msg = cv::format("FPS: %2.4f frame: %06d", fps, frame_num);
