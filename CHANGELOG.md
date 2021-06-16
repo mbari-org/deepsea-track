@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+# [1.16.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.15.0...v1.16.0) (2021-06-16)
+
+
+### Features
+
+* tracking improvements ([492e9de](http://bitbucket.org/mbari/deepsea-track/commits/492e9de9b9d4fd50490ef6900f5f2449cda65de4))
+
 # [1.15.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.14.0...v1.15.0) (2021-06-08)
 
 
