@@ -1,11 +1,10 @@
 {
-  "tracker1": 0,
-  "tracker2": 1,
-  "min_event_frames": 1,
-  "display_wait_msecs": 2000,
-  "tracker_wait_msecs": 0,
   "display": true,
   "create_video": true,
-  "nms_threshold": 0.4,
-  "score_threshold": 0.4
+  "display_wait_msecs": 10,
+  "min_event_frames": 1,
+  "nms_threshold": 0.5,
+  "score_threshold": 0.4,
+  "tracker": 0,
+  "tracker_wait_msecs": 0
 }

@@ -163,8 +163,11 @@ int main( int argc, char** argv ) {
         // enhance
         frame_enhanced = pre.update(frame_resized);
 
+        Mat gray, hsv, lab, color, laser_mask, mask, rescaled_img;
+        Mat binary_mask = pre.getDiffMean(frame_enhanced);
+
         // run the manager and time it
-        manager.run(event_objs, frame_enhanced, frame_num);
+        manager.run(event_objs, frame_enhanced, binary_mask, frame_num);
         fps = getTickFrequency() / (getTickCount() - timer);
 
         // get list of visual objects
@@ -202,12 +205,12 @@ int main( int argc, char** argv ) {
                     class_name = evt_obj.getClassName();
 
                 // overlay box and prediction
-                string description = class_name;//format("%s,%4.2f,%4.2f", class_name.c_str(), vo.bbox_tracker_.x, vo.bbox_tracker_.y);
-                //string description = cv::format("%s,%g", class_name.c_str(), vo.surprise_);
-                Utils::decorate(frame, bbox_tracker, color, short_uuid, class_name, 1, 0.7);
+                string description = cv::format("%s,%d", class_name.c_str(), int((*itve)->getSurprise()/100.));
+                Utils::decorate(frame, bbox_tracker, color, short_uuid, description, 4, 0.7);
             }
 
-            string msg = cv::format("FPS: %2.4f frame: %06d", fps, frame_num);
+//            string msg = cv::format("FPS: %2.4f frame: %06d", fps, frame_num);
+            string msg = cv::format("frame: %06d", frame_num);
             putText(frame, msg.c_str(), Point(int(0.025 * frame_width), int(0.025 * frame_height)),
                     FONT_HERSHEY_SIMPLEX, 0.5, Scalar(53, 200, 243), 1);
             if (cfg.display()) {

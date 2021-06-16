@@ -1,1 +1,1 @@
-["visualevents",[["visualevent",{"bounding_box":{"height":540,"width":412,"x":712,"y":46},"class_index":1,"class_name":"MICROSTOMUS","confidence":99,"frame_num":10,"occlusion":0,"surprise":3894,"uuid":"c6ddf016-8aa0-433a-a1d0-01ae659351e0"}]]]
+["visualevents",[["visualevent",{"bounding_box":{"height":388,"width":281,"x":704,"y":86},"class_index":1,"class_name":"MICROSTOMUS","confidence":100,"frame_num":10,"occlusion":0,"surprise":165,"uuid":"34afe5eb-b76a-4d02-ade5-887ffa035863"}]]]

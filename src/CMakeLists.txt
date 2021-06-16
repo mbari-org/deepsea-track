@@ -8,7 +8,7 @@ add_library(deepsea-track_library arguments.cc
         visual_event_mgr.cc zmq_listener.cc util/config.cc util/config_class_map.cc
         util/utils.cc util/voc_object.cc ${HEADER_LIST})
 
-target_include_directories(deepsea-track_library PUBLIC ../include)
+target_include_directories(deepsea-track_library PUBLIC ../include ../thirdparty)
 
 target_link_libraries(deepsea-track_library PRIVATE
         ${XercesLib}

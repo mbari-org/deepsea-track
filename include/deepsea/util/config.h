@@ -44,6 +44,7 @@ namespace deepsea {
             TT_TLD,
             TT_MOSSE,
             TT_CSRT,
+            TT_HOUGH,
             TT_INVALID = -1,
         };
 
@@ -55,14 +56,14 @@ namespace deepsea {
             { TT_TLD, "TLD" },
             { TT_MOSSE, "MOSSE" },
             { TT_CSRT, "CSRT" },
+            { TT_HOUGH, "HOUGH" },
         });
 
         struct TrackerConfig {
             int min_event_frames;
             float score_threshold;             //! minimum score of any detection to be considered as a seed for a visual event
             float nms_threshold;               //! minimum non maximum suppression score to detect overlapping objects
-            TrackerType type1;
-            TrackerType type2;
+            TrackerType type;
         };
 
         bool isInitialized() const { return init_; }

@@ -9,8 +9,7 @@
 namespace deepsea {
 
     void Config::from_json(const nlohmann::json &j) {
-        tracker_cfg_.type1 = j.at("tracker1").get<TrackerType>();
-        tracker_cfg_.type2 = j.at("tracker2").get<TrackerType>();
+        tracker_cfg_.type = j.at("tracker").get<TrackerType>();
         tracker_cfg_.score_threshold = j.at("score_threshold");
         tracker_cfg_.nms_threshold = j.at("nms_threshold");
         j.at("min_event_frames").get_to(tracker_cfg_.min_event_frames);
@@ -47,6 +46,10 @@ namespace deepsea {
                 std::cout << "CSRT tracker" << std::endl;
                 init_ = true;
                 break;
+            case TT_HOUGH:
+                std::cout << "HOUGH tracker" << std::endl;
+                init_ = true;
+                break;
             case TT_INVALID:
                 std::cout << "Invalid tracker!!" << std::endl;
                 init_ = true;
@@ -69,8 +72,7 @@ namespace deepsea {
             program_info_ = ss.str();
             program_info_.erase(std::remove(program_info_.begin(), program_info_.end(), '\n'), program_info_.end());
             std::cout << program_info_;
-            cout << "Tracker 1: ";  printTracker(tracker_cfg_.type1);
-            cout << "Tracker 2: ";  printTracker(tracker_cfg_.type2);
+            cout << "Tracker : ";  printTracker(tracker_cfg_.type);
             printf("Minimum event frames:%d\n", tracker_cfg_.min_event_frames);
         } catch (std::exception &e) {
             std::cout << "ERROR:" <<  filename << ":" << e.what() << std::endl;

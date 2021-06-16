@@ -1,9 +1,8 @@
 {
-  "tracker1": 0,
-  "tracker2": 1,
+  "tracker": 0,
   "min_event_frames": 1,
-  "display_wait_msecs": 2000,
-  "tracker_wait_msecs": 1000,
+  "display_wait_msecs": 200,
+  "tracker_wait_msecs": 0,
   "display": true,
   "create_video": true,
   "nms_threshold": 0.4,

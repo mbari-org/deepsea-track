@@ -43,10 +43,10 @@ namespace deepsea {
                 surprise_map = surprise_map.mul(total_surprise);
 
             Point2i pt(sz.width/2, sz.height/2);
-            double mean = input.getModels().at(pt.x+pt.y*sz.width).getMean();
-            double var = input.getModels().at(pt.x+pt.y*sz.width).getVar();
-            double val = surprise_map.at<double>(pt);
-            minMaxLoc(surprise_map, &min, &max);
+//            double mean = input.getModels().at(pt.x+pt.y*sz.width).getMean();
+//            double var = input.getModels().at(pt.x+pt.y*sz.width).getVar();
+//            double val = surprise_map.at<double>(pt);
+//            minMaxLoc(surprise_map, &min, &max);
             //printf("==========>MODELS: %d   %g %g  SURPRISE: %g min:%g max: %g\n", i, mean, var, val, min, max);
 
             // the updated models are the input to the next iteration:

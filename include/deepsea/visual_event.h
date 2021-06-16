@@ -48,31 +48,32 @@ using namespace nlohmann;
 using namespace saliency;
 
 namespace deepsea {
-    
+
     class VisualEvent {
     public:
         /// constructor
-        /// 
+        ///
         /// \param uuid the unique identifier string assigned to this event
         /// \param img the image the object was extracted from
+        /// \param bin_img a binary image with the foreground objects labeled as 1
         /// \param evt_obj the @VisualObject to initialize this event with
         /// \param cfg system configuration
         /// \param cfg_map detection class configuration
-        /// \param preprocess @Preprocess instance
-        VisualEvent(uuids::uuid uuid, const Mat &img, const EventObject &evt_obj, const Config &cfg,
-                    ConfigMaps &cfg_map);//, Preprocess *preprocess);
+        VisualEvent(uuids::uuid uuid, const Mat &img, const Mat &bin_img,
+                    const EventObject &evt_obj, const Config &cfg,
+                    ConfigMaps &cfg_map);
 
         /// destructor
         ~VisualEvent();
 
         /// updates prediction for the latest assigned object
-        /// \param img 
+        /// \param img
         /// \param evt_obj
-        /// \param frame 
-        void updatePrediction(const Mat &img, const EventObject &evt_obj, const unsigned int frame);
+        /// \param frame
+        void updatePrediction(const Mat &img, const Mat &bin_img, const EventObject &evt_obj, const unsigned int frame);
 
         /// updates prediction for the latest assigned object
-        void updatePrediction(const Mat &img, const unsigned int frame);
+        void updatePrediction(const Mat &img, const Mat &bin_img, const unsigned int frame);
 
         /// \return the latest visual object added to this event
         EventObject getLatestObject() const;
@@ -138,16 +139,15 @@ namespace deepsea {
         int max_size_, min_size_;
         VisualEvent::State state_;
         Config::TrackerConfig tracker_cfg_;
-        Ptr<Tracker> trackers_[2];
-        bool tracker_failed_[2];                    ///! true if the tracker failed or is not in use
+        Ptr<Tracker> tracker_;
+        bool tracker_failed_;                       ///! true if the tracker failed or is not in use
         ConfigMaps cfg_maps_;
-        Preprocess *preprocess_;                    ///! preprocess instance
 
         /// re/initializes trackers
         void initTracker(const Mat &img, const EventObject &vo, const unsigned int frame);
 
         /// updates the tracker
-        void update(const Mat &img, const unsigned int frame_num, const VOCObject &obj);
+        void update(const Mat &img, const Mat &bin_img, const unsigned int frame_num, const VOCObject &obj);
 
         /// Computes saliency map correlation
         /// \param[in] img
@@ -161,9 +161,11 @@ namespace deepsea {
 
         /// Checks if the tracker has predicted the event is close to the frame edge
         /// \param size size of the image the tracker output should be bound within
-        /// \param tracker the id of the tracker to check 1 or 2
+        /// \param percent how close in percent of the width/height to check
         /// \return true if close
-        bool boundsCheck(const Size &size, const Rect2d &box);
+        bool boundsCheck(const Size &size, const Rect2d &box, const float percent);
+
+        bool runHough(const Mat &img, const Mat &bin_img, Rect &box, bool reset);
     };
 
 // ########### inline methods
@@ -180,7 +182,7 @@ namespace deepsea {
         EventObject latest = objects_.back();
         ss << "Closing " << boost::uuids::to_string(uuid_) << "," << latest.getClassName() << ",";
         ss << boost::format("t1: %4.2f,") % latest.getBboxTracker().x <<
-        boost::format("%4.2f") % latest.getBboxTracker().y  << endl;
+           boost::format("%4.2f") % latest.getBboxTracker().y  << endl;
     }
 // ######################################################################
     inline uuids::uuid VisualEvent::getUUID() const { return uuid_; }
@@ -202,9 +204,5 @@ namespace deepsea {
         return ((frame_num >= start_frame_) && (frame_num <= end_frame_));
     }
 
-// ######################################################################
-    inline bool VisualEvent::trackerFailed(const uint tracker_id) const {
-        return tracker_failed_[tracker_id];
-    }
 
 }

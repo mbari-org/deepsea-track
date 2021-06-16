@@ -72,35 +72,116 @@ namespace deepsea {
     }
 
 // ######################################################################
-    void VisualEventManager::run(list<EventObject> &evt_objs, const Mat &img, const unsigned int frame_num) {
-        VisualEvent *target;
-        int sz = evt_objs.size();
-        list<EventObject> last = getObjects(frame_num - 1);
-        last.insert(last.end(), evt_objs.begin(), evt_objs.end());
+    void VisualEventManager::run(list<EventObject> &evt_objs, const Mat &img, const Mat &bin_img, const unsigned int frame_num) {
+        list<EventObject>::const_iterator itsobjs;
+        list<EventObject>::iterator itfobjs, best;
+        list<VisualEvent *>::const_iterator itve;
+        int sz;
+        double iou;
+        best = evt_objs.begin();
 
         // runNMS on detections to filter overlapping events
-        list<EventObject> filtered = runNMS(evt_objs);
+        list<EventObject> fobjs = runNMS(evt_objs);
 
-        // seed new events with objects that don't intersect with any existing visual events
-        list<EventObject>::const_iterator evt_obj;
-        for (evt_obj = filtered.begin(); evt_obj != filtered.end(); ++evt_obj) {
-            double cc = 0;
-            target = findEvent(img, *evt_obj, cc);
-            // if cannot find event this object belongs to, create a new event
-            if (target == NULL) {
-                const uuids::uuid id = (*evt_obj).getUuid();
-                printf("**** Adding new event **** %s\n", boost::uuids::to_string(id).c_str());
-                addVisualEvent(img, frame_num, *evt_obj);
-            } else
-                target->updatePrediction(img, *evt_obj, frame_num);
+        // seed new events with objects that don't match or intersect with any existing visual events
+        for (itve = events_.begin(); itve != events_.end(); ++itve) {
+            if (fobjs.empty()) break;
+            EventObject o = (*itve)->getLatestObject();
+            Rect2d r1 = o.getBboxTracker();
+            VisualEvent *ves_target = NULL;
+            double max_iou = 0.;
+            int max_area = 0;
+            double min_dist = numeric_limits<double>::max();
+            double max_cost =  numeric_limits<double>::max();
+
+            // find the largest intersecting object
+            for (itfobjs = fobjs.begin(); itfobjs != fobjs.end(); ++itfobjs) {
+                Rect2d r2 = itfobjs->getBboxTracker();
+                iou = Utils::iou(r1, r2);
+                float cost1 = sqrt(pow((double) (r1.x - r2.x), 2.0) + pow((double) (r1.y - r2.y), 2.0));
+                float cost2 = sqrt(pow((double) ((r1.x + r1.width) - (r2.y + r2.height)), 2.0) +
+                                   pow((double) ((r1.x + r1.width) - (r2.y + r2.height)), 2.0));
+                float cost = cost1 + cost2;
+                int area = r2.width*r2.height;
+                if (iou > 0.2 && cost < max_cost ) {
+                        best = itfobjs;
+                        max_iou = iou;
+                        max_area = area;
+                        max_cost = cost;
+                        ves_target = (*itve);
+                        cout << "Found best " << best->getBboxTracker() <<  " class " << best->getClassName() << endl;
+                }
+            }
+
+            // if found a match, remove any other overlapping objects. update the prediction, then erase it
+            if (ves_target != NULL) {
+                list<EventObject> sobjs = this->getObjects(frame_num);
+                list<int> eraseobjs;
+                Rect2d rbest = best->getBboxTracker();
+                int idx = 0;
+                iou = Utils::iou(itfobjs->getBboxTracker(), rbest);
+                for (itfobjs = fobjs.begin(); itfobjs != fobjs.end(); ++itfobjs) {
+                    if (best != itfobjs && iou > 0.) {
+                        cout << "Object at index " << idx << " iou " << iou << " to be removed" << endl;
+                        eraseobjs.push_back(idx);
+                        idx += 1;
+                    }
+                }
+                itfobjs = fobjs.begin();
+                list<int>::iterator ilist;
+                for (ilist = eraseobjs.begin(); ilist != eraseobjs.end(); ++ilist) {
+                    std::advance(itfobjs, *ilist);
+                    fobjs.erase(itfobjs);
+                }
+                cout << "Updating prediction" << endl;
+                (*ves_target).updatePrediction(img, bin_img, *best, frame_num);
+
+                cout << "Erasing best " << fobjs.size() << endl;
+                if (fobjs.empty()) break;
+                fobjs.erase(best);
+            }
+        }
+
+        // add any remaining event objects that do not overlap and are not enclosing each other
+        for (itsobjs = fobjs.begin(); itsobjs != fobjs.end(); ++itsobjs) {
+            bool overlapping_or_enclosed = false;
+            for (itve = events_.begin(); itve != events_.end(); ++itve) {
+                if ((*itve)->getEndFrame() - (*itve)->getStartFrame() > 1) {
+                    Rect2d r1, r2, r3;
+                    r1 = itfobjs->getBboxTracker(); r2 = (*itve)->getLatestObject().getBboxTracker();
+                    r3 = r1 & r2;
+                    iou = Utils::iou(r1, r2);
+                    if (iou > 0. || r3.area() == r2.area() || r3.area() == r1.area()) {
+                        overlapping_or_enclosed = true;
+                        break;
+                    }
+                }
+            }
+            if (overlapping_or_enclosed == false) {
+                if (itsobjs->getClassName().compare("Acanthoptilum") == 0 || itsobjs->getClassName().compare("Octopus rubescens") == 0 )
+                    continue;
+
+// if (itsobjs->getClassName().compare("Sebastes") == 0 ||
+//                    itsobjs->getClassName().compare("Sebastoblobus") ||
+//                    itsobjs->getClassName().compare("Octopus rubescens") ||
+//                    itsobjs->getClassName().compare("Anoplopoma fimbria") ||
+//                    itsobjs->getClassName().compare("Psolus squamatus"))
+//                        ){
+                cout << "**** Adding new VisualEvent **** " << "class: " << itsobjs->getClassName() << " score: "
+                     << itsobjs->getConfidence() << endl;
+                addVisualEvent(img, bin_img, frame_num, *itsobjs);
+//            }
+            }
         }
 
         // update all events
         sz = events_.size();
         cout << frame_num << ":Number of VisualEvents " << sz << endl;
-        list<VisualEvent *>::const_iterator itve;
-        for (itve = events_.begin(); itve != events_.end(); ++itve)
-            (*itve)->updatePrediction(img, frame_num);
+        for (itve = events_.begin(); itve != events_.end(); ++itve) {
+            // only update if needed
+            if ((*itve)->getEndFrame() != frame_num)
+                (*itve)->updatePrediction(img, bin_img, frame_num);
+        }
 
         // find largest occlusion with any given event and update the event occlusions
         for (itve = events_.begin(); itve != events_.end(); ++itve) {
@@ -112,10 +193,10 @@ namespace deepsea {
     }
 
 // ######################################################################
-    void VisualEventManager::addVisualEvent(const Mat &img, const unsigned int frame_num, const EventObject &vob) {
+    void VisualEventManager::addVisualEvent(const Mat &img, const Mat &bin_img, const unsigned int frame_num, const EventObject &vob) {
         uuids::uuid uuid1 = random_generator_();
-        VisualEvent *evt = new VisualEvent(uuid1, img, vob, cfg_, cfg_maps_);
-        evt->updatePrediction(img, vob, frame_num);
+        VisualEvent *evt = new VisualEvent(uuid1, img, bin_img, vob, cfg_, cfg_maps_);
+        evt->updatePrediction(img, bin_img, vob, frame_num);
         events_.push_back(evt);
     }
 
@@ -137,32 +218,6 @@ namespace deepsea {
         return max_iou;
     }
 
-    // ######################################################################
-    VisualEvent *VisualEventManager::findEvent(const Mat &img, const EventObject &evt_obj, double &cc) {
-        list<VisualEvent *>::const_iterator itve;
-        double max_iou = 0.;
-        double min_cost = numeric_limits<double>::max();
-        VisualEvent *target = NULL;
-
-        for (itve = events_.begin(); itve != events_.end(); ++itve) {
-            EventObject latest_evt_obj = (*itve)->getLatestObject();
-            Rect2d r1 = latest_evt_obj.getBboxTracker();
-            Rect2d r2 = evt_obj.getBboxTracker();
-            double iou = Utils::iou(r1, r2);
-            float cost1 = sqrt(pow((double) (r1.x - r2.x), 2.0) + pow((double) (r1.y - r2.y), 2.0));
-            float cost2 = sqrt(pow((double) ((r1.x + r1.width) - (r2.y + r2.height)), 2.0) +
-                               pow((double) ((r1.x + r1.width) - (r2.y + r2.height)), 2.0));
-            float cost = cost1 + cost2;
-
-            if (iou > 0.f && iou > max_iou && cost < min_cost) {
-                target = (*itve);
-                max_iou = iou;
-                min_cost = cost;
-                cout << "*Event " << (*itve)->getUUID() << " cost " << min_cost << endl;
-            }
-        }
-        return target;
-    }
 
 // ######################################################################
     void VisualEventManager::cleanUp() {

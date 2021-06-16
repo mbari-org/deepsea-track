@@ -36,6 +36,8 @@ namespace deepsea {
 
         Mat update(const Mat &img);
 
+        Mat getDiffMean(const Mat &img);
+
     private:
         void updateGammaCurve(const Mat &img, bool init);
 

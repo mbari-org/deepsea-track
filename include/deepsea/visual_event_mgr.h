@@ -46,9 +46,10 @@ namespace deepsea {
 
         /// \brief creates and destroys VisualEvents
         /// \param evt_objs
-        /// \param img
+        /// \param img color image
+        /// \param bin_img binary masked image
         /// \param frame_num
-        void run(list<EventObject> &evt_objs, const Mat &img, const unsigned int frame_num);
+        void run(list<EventObject> &evt_objs, const Mat &img, const Mat &bin_img, const unsigned int frame_num);
 
         list<EventObject> runNMS(const list<EventObject> &vobs);
 
@@ -61,13 +62,6 @@ namespace deepsea {
         list<EventObject> getObjects(unsigned int frame_num) const;
 
     private:
-        /// \brief find the event that best matches the given EventObject
-        /// \param img
-        /// \param evt_obj
-        /// \param cc
-        /// \return
-        VisualEvent *findEvent(const Mat &img, const EventObject &evt_obj, double &cc);
-
         /// \brief find the largest intersection of any event with the event object
         /// \param evt_obj event object to search for intersections
         /// \return
@@ -80,6 +74,6 @@ namespace deepsea {
         ConfigMaps cfg_maps_;
         Config cfg_;
 
-        void addVisualEvent(const Mat &img, const unsigned int frame_num, const EventObject &vob);
+        void addVisualEvent(const Mat &img, const Mat &bin_img, const unsigned int frame_num, const EventObject &vob);
     };
 }

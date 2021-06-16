@@ -18,7 +18,7 @@
  * David and Lucile Packard Foundation
  */
 
-//!\file ImageCache.h  Caches images and computes running mean used in <code>preprocess.h</code>
+//!\file image_cache.h  Caches images and computes running mean used in <code>preprocess.h</code>
 
 #include <deque>
 #include <opencv2/core/mat.hpp>

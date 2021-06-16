@@ -119,6 +119,9 @@ namespace deepsea {
         /// \param surprise
         void setSurprise(double surprise);
 
+        /// set the total number of foreground pixels
+        /// \param fgsum
+        void setForegroundSum(int fgsum);
 
         /// \brief utility method to convert from JSON to event_object
         /// \param[in/out] j JSON object to load to
@@ -158,7 +161,7 @@ namespace deepsea {
             j.at("surprise").get_to(p.surprise_);
             j.at("frame_num").get_to(p.frame_num_);
             p.class_confidence_ = (float) confidence/100.;
-            p.surprise_ = (float) surprise*10;
+            p.surprise_ = (float) surprise/100.;
         };
 
         /// \brief copy operator

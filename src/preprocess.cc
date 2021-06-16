@@ -39,6 +39,23 @@ namespace deepsea {
 
     Preprocess::~Preprocess() {}
 
+    Mat Preprocess::getDiffMean(const Mat &img) {
+        cv::Mat bin_mask = cv::Mat::zeros(img.rows, img.cols, CV_8UC1);
+        if (cache_.size() > 0) {
+            Mat diff, mean_img;
+            const Mat3f mean_imgf = cache_.mean();
+            mean_imgf.assignTo(mean_img, CV_8UC3);
+            cv::absdiff(img, mean_img, diff);
+
+            cv::Mat gray; cvtColor(diff, gray, COLOR_RGB2GRAY);
+            cv::threshold(gray, bin_mask, 0, 255, THRESH_BINARY_INV | THRESH_OTSU);
+        } else {
+            cv::Mat gray; cvtColor(img, gray, COLOR_RGB2GRAY);
+            cv::threshold(gray, bin_mask, 0, 255, THRESH_BINARY_INV | THRESH_OTSU);
+        }
+        return bin_mask;
+    }
+
     Mat Preprocess::update(const Mat &img) {
         // if first frame update gamma correction curve
         if (cache_.size() == 0) {
@@ -60,8 +77,8 @@ namespace deepsea {
             updateGammaCurve(img, false);
         }
         Mat gray, hsv, lab, color, laser_mask;
-        cvtColor(img, hsv, COLOR_BGR2HSV);
-        cvtColor(img, gray, COLOR_BGR2GRAY);
+        cvtColor(img, hsv, COLOR_RGB2HSV);
+        cvtColor(img, gray, COLOR_RGB2GRAY);
 
         Vec3b *ptr_hsv;
         for (int r = 0; r < hsv.rows; r++) {
@@ -73,8 +90,8 @@ namespace deepsea {
             }
         }
 
-        cvtColor(hsv, color, COLOR_HSV2BGR);
-        cvtColor(color, lab, COLOR_BGR2Lab);
+        cvtColor(hsv, color, COLOR_HSV2RGB);
+        cvtColor(color, lab, COLOR_RGB2Lab);
         Mat1b bin_mask = Mat::zeros(color.size(), CV_8U);
 
         // mean from the cache
@@ -134,7 +151,7 @@ namespace deepsea {
         int h_size = 256;
         int channels = 0;
         _InputArray mask;
-        cvtColor(img, gray, COLOR_BGR2GRAY);
+        cvtColor(img, gray, COLOR_RGB2GRAY);
         calcHist(&img, 1, &channels, mask, hist, 1, &h_size, h_range);
         gray.release();
         return hist;

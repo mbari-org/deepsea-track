@@ -2,6 +2,7 @@
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/mat.hpp>
 #include <opencv2/saliency.hpp>         // saliency::StaticSaliencyFineGrained
 #include <boost/format.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -9,14 +10,16 @@
 #include <deepsea/visual_event.h>
 #include <deepsea/surprise_detector.h>
 
+using namespace cv;
 using namespace std;
 using namespace saliency;
 
 namespace deepsea {
 
 // ######################################################################
-    VisualEvent::VisualEvent(uuids::uuid uuid, const Mat &img, const EventObject &evt_obj, const Config &cfg,
-                             ConfigMaps &cfg_map)
+    VisualEvent::VisualEvent(uuids::uuid uuid, const Mat &img, const Mat &bin_img,
+                            const EventObject &evt_obj, const Config &cfg,
+                            ConfigMaps &cfg_map)
             : uuid_(uuid),
               start_frame_(evt_obj.getFrameNum()),
               end_frame_(evt_obj.getFrameNum()),
@@ -26,14 +29,8 @@ namespace deepsea {
               state_(VisualEvent::OPEN),
               tracker_cfg_(cfg.getTracker()),
               cfg_maps_(cfg_map){
-        tracker_failed_[0] = false;
-        tracker_failed_[1] = false;
-        trackers_[0] = initTracker(tracker_cfg_.type1);
-        trackers_[1] = initTracker(tracker_cfg_.type2);
-        if (trackers_[0] == NULL)
-            tracker_failed_[0] = true;
-        if (trackers_[1] == NULL)
-            tracker_failed_[1] = true;
+        tracker_failed_ = false;
+        tracker_ = initTracker(tracker_cfg_.type);
         objects_.push_back(evt_obj);
         Mat img_clone = img.clone();
         Mat crop = img_clone(evt_obj.getBboxTracker());
@@ -45,140 +42,105 @@ namespace deepsea {
         }
     }
 
-// ######################################################################
+    // ######################################################################
     VisualEvent::~VisualEvent() {
         objects_.clear();
-        trackers_[0].release();
-        if (trackers_[1] != NULL)
-            trackers_[1].release();
+        tracker_.release();
         alg_.release();
     }
 
 // ######################################################################
-    void VisualEvent::updatePrediction(const Mat &img, const EventObject &evt_obj, const unsigned int frame_num) {
-        if (end_frame_ - start_frame_ > 1) {
-            trackers_[0].release();
-            if (trackers_[1] != nullptr)
-                trackers_[1].release();
-            trackers_[0] = initTracker(tracker_cfg_.type1);
-            trackers_[1] = initTracker(tracker_cfg_.type2);
-        }
-        tracker_failed_[0] = false;
-        tracker_failed_[1] = false;
+    void VisualEvent::updatePrediction(const Mat &img, const Mat &bin_img, const EventObject &evt_obj, const unsigned int frame_num) {
+        tracker_failed_ = false;
 
-        if (end_frame_ - start_frame_ > 1 && boundsCheck(img.size(), evt_obj.getBboxTracker())) {
-            cout << frame_num << ":" << boost::uuids::to_string(evt_obj.getUuid())
-                 << " Too close to edge to start tracker1" << endl;
-            tracker_failed_[0] = true;
-            tracker_failed_[1] = true;
-            close();
+        if (end_frame_ - start_frame_ > 0) {
+            tracker_.release();
+            tracker_ = initTracker(tracker_cfg_.type);
+//            cout << "Resetting Hough Tracker " << frame_num << endl;
+//            Rect box = evt_obj.getBboxTracker();
+//            if (runHough(img, bin_img, box, true) == false)
+//                tracker_failed_ = true;
         }
-        else {
-            if (!trackers_[0]->init(img, evt_obj.getBboxTracker())) {
+
+//        if (end_frame_ - start_frame_ > 1 && boundsCheck(img.size(), evt_obj.getBboxTracker(), 0.01)) {
+//            cout << frame_num << ":" << boost::uuids::to_string(evt_obj.getUuid())
+//                 << " Too close to edge to start tracker1" << endl;
+//            tracker_failed_ = true;
+//            close();
+//        }
+//        else {
+            if (!tracker_->init(img, evt_obj.getBboxTracker())) {
                 if (end_frame_ - start_frame_ > 1) {
                     ostringstream ss;
-                    ss << frame_num << ":Tracking init failed for tracker 1" << boost::uuids::to_string(uuid_) << ","
+                    ss << frame_num << ":Tracking init failed for tracker" << boost::uuids::to_string(uuid_) << ","
                        << evt_obj.getClassName();
-                    tracker_failed_[0] = true;
+                    tracker_failed_ = true;
                 }
             }
-            if (trackers_[1] == nullptr) {
-                tracker_failed_[1] = true;
-            } else if (!trackers_[1]->init(img, evt_obj.getBboxTracker())) {
-                if (end_frame_ - start_frame_ > 1) {
-                    ostringstream ss;
-                    ss << frame_num << ":Tracking init failed for tracker 2" << boost::uuids::to_string(uuid_) << ","
-                       << evt_obj.getClassName();
-                    tracker_failed_[1] = true;
-                }
-            }
-            if (tracker_failed_[0] && tracker_failed_[1]) {
+
+            if (tracker_failed_) {
                 close();
             } else {
                 VOCObject voc(evt_obj.getClassName(), evt_obj.getConfidence(), evt_obj.getBboxTracker());
-                update(img, frame_num, voc);
+                update(img, bin_img, frame_num, voc);
             }
-        }
+//        }
     }
 
 
 // ######################################################################
-    void VisualEvent::updatePrediction(const Mat &img, const unsigned int frame_num) {
-        Rect2d r1, r2;
-        if (end_frame_ - start_frame_ > 1 && objects_.back().getFrameNum() < frame_num) {
-            EventObject evt_obj = objects_.back();
-            if (trackers_[0]->update(img, r1)) {
-                Size size = img.size();
-                if (boundsCheck(size, r1)) {
-                    cout << frame_num << ":" << boost::uuids::to_string(evt_obj.getUuid())
-                         << " Too close to edge - closing tracker1 to avoid drift" << endl;
-                    tracker_failed_[0] = true;
-                }
-            }
-            else {
-                tracker_failed_[0] = true;
-            }
-            if (trackers_[1] != NULL && trackers_[1]->update(img, r2)) {
-                Size size = img.size();
-                if (boundsCheck(size, r2)) {
-                    cout << frame_num << ":" << boost::uuids::to_string(evt_obj.getUuid())
-                         << " Too close to edge - closing tracker2 to avoid drift" << endl;
-                    tracker_failed_[1] = true;
-                }
-            }
-            else {
-                tracker_failed_[1] = true;
-            }
-            if (tracker_failed_[0] && tracker_failed_[1]) {
-                cout << frame_num << ":" << "Tracking failed for " << boost::uuids::to_string(evt_obj.getUuid()) << endl;
-                close();
-            }
-            else {
-                EventObject last_evt_obj = objects_.back();
-                Rect2d r = last_evt_obj.getBboxTracker();
-                double top = r.x;
-                double top1 = r1.x;
-                double top2 = r2.x;
-                double left = r.y;
-                double left1 = r1.y;
-                double left2 = r2.y;
-                double bottom = r.y + r.height;
-                double bottom1 = r1.y + r1.height;
-                double bottom2 = r2.y + r2.height;
-                double right = r.x + r.width;
-                double right1 = r1.x + r1.width;
-                double right2 = r2.x + r2.width;
-                float cost1 = numeric_limits<double>::max();
-                float cost2 = numeric_limits<double>::max();
-                float max_cost = pow((double)1.3, 2.0) + 0.30*max(r.width, r.height);
+    void VisualEvent::updatePrediction(const Mat &img, const Mat &bin_img, const unsigned int frame_num) {
+        Rect2d r1;
+        Rect r;
+        EventObject evt_obj = objects_.back();
 
-                if (!this->tracker_failed_[0]) {
-                    cost1 = Utils::iou(r, r1)*(r.width/r1.width)*(r.height/r1.height)*
-                            (sqrt(pow((double)(top - top1),2.0) +  pow((double)(left - left1),2.0)) +
-                            sqrt(pow((double)(bottom - bottom1),2.0) + pow((double)(right - right1),2.0)));
-                }
-                if (!this->tracker_failed_[1]) {
-                    cost2 = Utils::iou(r, r2)*(r.width/r2.width)*(r.height/r2.height) +
-                            (sqrt(pow((double)(top - top2),2.0) +  pow((double)(left - left2),2.0)) +
-                             sqrt(pow((double)(bottom - bottom2),2.0) + pow((double)(right - right2),2.0)));
-                }
-                if (cost1 < cost2 && cost1 < max_cost)
-                    update(img, frame_num, VOCObject(evt_obj.getClassName(), evt_obj.getConfidence(), r1));
-                else if (cost2 < cost1 && cost2 < max_cost)
-                    update(img, frame_num, VOCObject(evt_obj.getClassName(), evt_obj.getConfidence(), r2));
-                else {
-                    cout << frame_num << ":" << "Cost too high " << "Tracking failed for "
-                    << boost::uuids::to_string(evt_obj.getUuid()) << endl;
-                    close();
-                }
+        if (tracker_->update(img, r1)) {
+//        if (runHough(img, bin_img, r, false)) {
+            Size size = img.size();
+//            int top = r.y;
+//            int bottom = r.y + r.height;
+//            int left = r.x;
+//            int right = r.x + r.width;
+//            r1 = Rect(left, top, (right-left), (bottom-top));
+
+            if (boundsCheck(size, r1, .01)) {
+                cout << frame_num << ":" << boost::uuids::to_string(evt_obj.getUuid())
+                     << " Too close to edge - closing tracker to avoid drift" << endl;
+                tracker_failed_ = true;
             }
+        }
+        else {
+            tracker_failed_ = true;
+        }
+        if (tracker_failed_) {
+            cout << frame_num << ":" << "Tracking failed for " << boost::uuids::to_string(evt_obj.getUuid()) << endl;
+            close();
+        }
+        else {
+//            EventObject last_evt_obj = objects_.back();
+//            Rect2d r = last_evt_obj.getBboxTracker();
+//            double top = r.x;
+//            double top1 = r1.x;
+//            double left = r.y;
+//            double left1 = r1.y;
+//            double bottom = r.y + r.height;
+//            double bottom1 = r1.y + r1.height;
+//            double right = r.x + r.width;
+//            double right1 = r1.x + r1.width;
+//            float max_cost = pow((double)1.3, 2.0) + 0.30*max(r.width, r.height);
+//            float cost1 = (sqrt(pow((double)(top - top1),2.0) +  pow((double)(left - left1),2.0)) +
+//                     sqrt(pow((double)(bottom - bottom1),2.0) + pow((double)(right - right1),2.0)));
+//            if (cost1 < max_cost)
+                update(img, bin_img, frame_num, VOCObject(evt_obj.getClassName(), evt_obj.getConfidence(), r1));
+//            else
+//                close();
         }
     }
 
 // ######################################################################
-    bool VisualEvent::boundsCheck(const Size &size, const Rect2d &bbox) {
-        int width_pad = 0.01 * bbox.width;
-        int height_pad = 0.01 * bbox.height;
+    bool VisualEvent::boundsCheck(const Size &size, const Rect2d &bbox, const float percent) {
+        int width_pad = int(percent * bbox.width);
+        int height_pad = int(percent * bbox.height);
         if (bbox.x <= width_pad ||
             bbox.y <= height_pad ||
             bbox.x + bbox.width > size.width - width_pad ||
@@ -193,7 +155,7 @@ namespace deepsea {
 
         // first check if this event is close to the edge and if so skip
         EventObject evt_obj = objects_.back();
-        if (boundsCheck(size, evt_obj.getBboxTracker()) ) {
+        if (boundsCheck(size, evt_obj.getBboxTracker(), 0.01) ) {
             cout << "skipping surprise compute for " << boost::uuids::to_string(uuid_) << endl;
             prev_saliency_.release();
             return 0.;
@@ -217,8 +179,8 @@ namespace deepsea {
             resized_image = crop;
             alg_->computeSaliency(resized_image, prev_saliency_);
 
-            // initialize map with queue of 3
-            surprise_map_ = SurpriseMap(3, resized_image.size());
+            // initialize map with queue of 30
+            surprise_map_ = SurpriseMap(30, resized_image.size());
         }
         else
             resize(crop, resized_image, prev_saliency_.size(), INTER_AREA);  //resize to same as cache
@@ -243,7 +205,7 @@ namespace deepsea {
 
 // ######################################################################
     void
-    VisualEvent::update(const Mat &img, const unsigned int frame_num, const VOCObject &obj) {
+    VisualEvent::update(const Mat &img, const Mat &bin_img, const unsigned int frame_num, const VOCObject &obj) {
         const Rect2d bbox = obj.getBox();
         const string candidate_class_name = obj.getName();
         const float candidate_class_score = obj.getScore();
@@ -253,7 +215,6 @@ namespace deepsea {
         float class_confidence = candidate_class_score;
         float high_score = 0.f;
         float avg_score;
-        int foobar = 0;
         int high_frames = 0;
         EventObject evt_obj;
         if (objects_.size() > 0)
@@ -305,7 +266,7 @@ namespace deepsea {
         evt_obj.setBboxTracker(bbox);
 
         cout << frame_num << ":Updating prediction for " <<  boost::uuids::to_string(uuid_)
-            << " to " << class_name << " " << " box " << bbox << endl;
+            << " to " << class_name << " " << "box " << bbox << endl;
 
         if (evt_obj.getArea() > max_size_) {
             max_size_ = evt_obj.getArea();
@@ -319,7 +280,11 @@ namespace deepsea {
 
         if (bbox.x >= 0 && bbox.y >= 0 && bbox.x + bbox.width < img.cols &&  bbox.y + bbox.height < img.rows) {
             Mat crop = img(bbox);
-            evt_obj.setSurprise(computeSurprise(img.size(), crop));
+            double surprise = computeSurprise(img.size(), crop);
+            if (total_frames > 1)
+                evt_obj.setSurprise(surprise);
+            else
+                evt_obj.setSurprise(0.);
         }
 
         if (total_frames >= tracker_cfg_.min_event_frames) {
@@ -345,8 +310,21 @@ namespace deepsea {
             return TrackerKCF::create();
         else if (type == Config::TT_TLD)
             return TrackerTLD::create();
-        else if (type == Config::TT_MEDIANFLOW)
-            return TrackerMedianFlow::create();
+        else if (type == Config::TT_MEDIANFLOW) {
+            TrackerMedianFlow::Params params;
+//            int pointsInGrid;      //!<square root of number of keypoints used; increase it to trade = 10
+//            //!<accurateness for speed
+//            cv::Size winSize;      //!<window size parameter for Lucas-Kanade optical flow Size(3,3)
+//            int maxLevel;          //!<maximal pyramid level number for Lucas-Kanade optical flow = 5
+//            TermCriteria termCriteria; //!<termination criteria for Lucas-Kanade optical flow  = type=3, maxCount=20, epsilon=0.299999
+//            cv::Size winSizeNCC;   //!<window size around a point for normalized cross-correlation check (30,30)
+//            double maxMedianLengthOfDisplacementDifference; //!<criterion for loosing the tracked object 10
+//            params.maxMedianLengthOfDisplacementDifference
+//            params.winSizeNCC = Size(5,5);
+            params.maxMedianLengthOfDisplacementDifference = 8;
+            params.winSize = Size(9,9);
+            return TrackerMedianFlow::create(params);
+        }
         else if (type == Config::TT_MOSSE)
             return TrackerMOSSE::create();
         else if (type == Config::TT_CSRT)

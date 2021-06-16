@@ -201,6 +201,7 @@ This is human-readable descriptions and colors to associate to each class, e.g.
 
 The *deepsea_cfg.json* should contain the index for the type of tracker you'd like to use:
 These correspond to 4 of the 8 available [OpenCV](https://docs.opencv.org/) trackers.
+The recommended tracker for smooth predictable motion is the MEDIANFLOW.
 
 | id   | Tracker           |
 |----------|---------------|
@@ -215,22 +216,12 @@ e.g. this uses the MEDIANFLOW tracker and drops the second tracker:
 *deepsea_cfg.json*
 ```json
 {
-  "tracker1": 0,
-  "tracker2": -1,
+  "tracker": 0,
+  "create_video": true,
   "min_event_frames": 3,
   "display": false,
-  "display_wait_msecs": 2000,
-  "tracker_wait_msecs": 10
-}
-```
-e.g. this uses a combined MEDIANFLOW and KCF tracker:
-*deepsea_cfg.json*
-```json
-{
-  "tracker1": 0,
-  "tracker2": 1,
-  "min_event_frames": 3,
-  "display": false,
+  "nms_threshold": 0.5,
+  "score_threshold": 0.4,
   "display_wait_msecs": 2000,
   "tracker_wait_msecs": 10
 }
@@ -238,9 +229,9 @@ e.g. this uses a combined MEDIANFLOW and KCF tracker:
 
 | field   | description           |
 |----------|---------------|
-| tracker1 | The primary tracker - must be a valid id  |
-| tracker2 | Optional secondary tracker - can be -1 for *no* second tracker  |
+| tracker | The tracker - must be a valid id  |
 | tracker_wait_msecs |  The time in milliseconds to pause between running the tracker on each frame; useful if detector messages are slow over zmq |
+| create_video | Set True to create a .mp4 video of the output |
 | display | Set True to see the frame output displayed while running |
 | display_wait_msecs | The time in milliseconds to wait to while displaying the frame output |
 | min_event_frames | Only VisualEvents greater than this number of frames are stored; used to remove short invalid tracks |
