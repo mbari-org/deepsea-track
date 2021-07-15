@@ -58,8 +58,8 @@ namespace deepsea {
             int rc = zmq::poll(item, 1, timeout); // poll for timeout period only
             assert(rc == 1); //todo put a meaningful message here if does timeout. rc=1 means it returned one item
             this->started_ = true;
+            cout << "Listening for visual events topic " << topic_ << " on " << address_ << endl;
             while(!stopped_) {
-                cout << "Listening for visual events topic " << topic_ << " on " << address_ << endl;
                 auto res = subscriber.recv(msg, zmq::recv_flags::none);
                 string s = string(static_cast<char*>(msg.data()), msg.size());
                 float xmin, xmax, ymin, ymax;
