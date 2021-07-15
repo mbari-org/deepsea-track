@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+## [1.16.1](http://bitbucket.org/mbari/deepsea-track/compare/v1.16.0...v1.16.1) (2021-07-15)
+
+
+### Performance Improvements
+
+* move listening to outside of loop ([c633c40](http://bitbucket.org/mbari/deepsea-track/commits/c633c400af960df6ac7c878ac2b1db04c4b23849))
+
 # [1.16.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.15.0...v1.16.0) (2021-06-16)
 
 
