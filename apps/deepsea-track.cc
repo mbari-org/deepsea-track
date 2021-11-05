@@ -114,7 +114,9 @@ int main( int argc, char** argv ) {
 
     while(cap.read(frame)) {
 
-        cout << "====================== Processing frame " << frame_num << "====================== " << endl;
+        list<VisualEvent *> events_last = manager.getEvents(frame_num - 1);
+	string summary = cv::format("Processing frame %06d FPS %2.4f VisualEvents %03d", frame_num, fps, events_last.size());
+        cout << "====================== " << summary << " ====================== " << endl;
 
         // if loading detections over zmq, wait for start
         if (zmq.initialized())
@@ -155,6 +157,16 @@ int main( int argc, char** argv ) {
             else { // otherwise read detections sent over zmq
                 event_objs = zmq.getObjects(frame_num);
             }
+        }
+
+ 	// if no detections, no visual object, we aren't creating a video, skip to the next frame
+        if (cfg.trackerWait() > 0
+            && frame_num > zmq.lastFrameNum()
+            && event_objs.size() == 0
+            && events_last.size() == 0
+            && (cfg.display() || cfg.createVideo()) ) {
+            frame_num +=1;
+            continue;
         }
 
         double timer = (double)getTickCount();
