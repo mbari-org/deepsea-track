@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+## [1.16.2](http://bitbucket.org/mbari/deepsea-track/compare/v1.16.1...v1.16.2) (2021-11-05)
+
+
+### Performance Improvements
+
+* skip over loop if no detections, objects and not generating visuals ([617768e](http://bitbucket.org/mbari/deepsea-track/commits/617768e7c6ba425d3df20b8860035f68f2be4463))
+
 ## [1.16.1](http://bitbucket.org/mbari/deepsea-track/compare/v1.16.0...v1.16.1) (2021-07-15)
 
 
