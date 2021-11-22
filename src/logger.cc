@@ -10,10 +10,12 @@ using namespace nlohmann;
 namespace deepsea {
 
 // ######################################################################
-    Logger::Logger(const Config &cfg, unsigned int start_frame_num, string out_dir)
-            : cfg_(cfg),
-              start_frame_num_(start_frame_num),
-              out_dir_(out_dir){
+    Logger::Logger(Config cfg, string out_dir)
+            : out_dir_(out_dir){
+        ofstream out_file(out_dir_ + "args.json");
+        json j = json();
+        cfg.save(j);
+        out_file << j;
     }
 
 // ######################################################################
@@ -33,7 +35,6 @@ namespace deepsea {
 
             // only log events that are valid
             if ((*itve)->getState() == VisualEvent::State::VALID) {
-                uuids::uuid id = (*itve)->getUUID();
                 EventObject vo = (*itve)->getLatestObject();
                 json voj;
                 EventObject::to_json(voj, vo, resize_factor_width, resize_factor_height);

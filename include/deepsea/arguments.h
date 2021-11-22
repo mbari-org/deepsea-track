@@ -57,6 +57,7 @@ namespace deepsea {
         unsigned int stride_;            ///! stride in detections, 1-based. e.g. --stride=5 will skip seeding new events to every 5th detection
         string topic_;                   ///! topic to listen on at address, e.g. VisualEvents
         string address_;                 ///! socket address for the detector output, e.g. tcp://127.0.0.1:6432
+        string xml_format_;              ///! xml input file format, e.g. f06d.xml for f000001.xml f000002.xml, etc.
     };
 
 }

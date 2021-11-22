@@ -61,7 +61,7 @@ namespace deepsea {
             vector_vob.push_back(*itvoc);
         }
 
-        NMSBoxes(boxes, scores, cfg_.getTracker().score_threshold, cfg_.getTracker().nms_threshold, indices);
+        NMSBoxes(boxes, scores, cfg_.getTrackerCfg().score_threshold, cfg_.getTrackerCfg().nms_threshold, indices);
 
         for (size_t i = 0; i < indices.size(); ++i) {
             int idx = indices[i];
@@ -89,10 +89,7 @@ namespace deepsea {
             EventObject o = (*itve)->getLatestObject();
             Rect2d r1 = o.getBboxTracker();
             VisualEvent *ves_target = NULL;
-            double max_iou = 0.;
-            int max_area = 0;
-            double min_dist = numeric_limits<double>::max();
-            double max_cost =  numeric_limits<double>::max();
+            double max_cost = numeric_limits<double>::max();
 
             // find the largest intersecting object
             for (itfobjs = fobjs.begin(); itfobjs != fobjs.end(); ++itfobjs) {
@@ -102,11 +99,8 @@ namespace deepsea {
                 float cost2 = sqrt(pow((double) ((r1.x + r1.width) - (r2.y + r2.height)), 2.0) +
                                    pow((double) ((r1.x + r1.width) - (r2.y + r2.height)), 2.0));
                 float cost = cost1 + cost2;
-                int area = r2.width*r2.height;
                 if (iou > 0.2 && cost < max_cost ) {
                         best = itfobjs;
-                        max_iou = iou;
-                        max_area = area;
                         max_cost = cost;
                         ves_target = (*itve);
                         cout << "Found best " << best->getBboxTracker() <<  " class " << best->getClassName() << endl;
@@ -157,20 +151,11 @@ namespace deepsea {
                     }
                 }
             }
-            if (overlapping_or_enclosed == false) {
-                if (itsobjs->getClassName().compare("Acanthoptilum") == 0 || itsobjs->getClassName().compare("Octopus rubescens") == 0 )
-                    continue;
-
-// if (itsobjs->getClassName().compare("Sebastes") == 0 ||
-//                    itsobjs->getClassName().compare("Sebastoblobus") ||
-//                    itsobjs->getClassName().compare("Octopus rubescens") ||
-//                    itsobjs->getClassName().compare("Anoplopoma fimbria") ||
-//                    itsobjs->getClassName().compare("Psolus squamatus"))
-//                        ){
+            Rect2d r = itsobjs->getBboxTracker();
+            if (overlapping_or_enclosed == false && r.height > 10 && r.width > 10) {
                 cout << "**** Adding new VisualEvent **** " << "class: " << itsobjs->getClassName() << " score: "
                      << itsobjs->getConfidence() << endl;
-                addVisualEvent(img, bin_img, frame_num, *itsobjs);
-//            }
+                addVisualEvent(img, bin_img, frame_num, *itsobjs );
             }
         }
 

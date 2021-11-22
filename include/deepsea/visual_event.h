@@ -49,6 +49,8 @@ using namespace saliency;
 
 namespace deepsea {
 
+#define BOUNDS_PERCENT 0.01f     // percent distance for tracker to be near to bounds to close out or not start
+
     class VisualEvent {
     public:
         /// constructor
@@ -81,8 +83,8 @@ namespace deepsea {
         /// \brief set the occlusion for the latest EventObject
         void setOcclusion(float occlusion);
 
-        /// \brief initializes the tracker defined by the configuration file
-        Ptr<Tracker> initTracker(Config::TrackerType type);
+        /// \brief creates the tracker defined by the configuration file
+        Ptr<Tracker> createTracker();
 
         /// \return total surprise image of last detected object
         inline double getSurprise();
@@ -129,7 +131,6 @@ namespace deepsea {
         map<string, float> class_confidences_;      ///! maps to store class confidences used in voting
         map<string, int> class_indexes_;            ///! maps to store class indexes used in voting
         deque<EventObject> objects_;
-        EventObject max_object_;
         SurpriseMap surprise_map_;                  ///! surprise map used for (post-processed) visualization and training
         Ptr<Saliency> alg_;                         ///! saliency algorithm; used to preprocess data in the surprise map
         Mat1f prev_saliency_;                       ///! output from saliency on previous image
@@ -141,6 +142,8 @@ namespace deepsea {
         Config::TrackerConfig tracker_cfg_;
         Ptr<Tracker> tracker_;
         bool tracker_failed_;                       ///! true if the tracker failed or is not in use
+        bool tracker_init_;                         ///! true if the tracker has been initialized with a bounding box
+        int pad_;                                   ///! padding in pixels - used to check if close to border and to pad objects before tracking
         ConfigMaps cfg_maps_;
 
         /// re/initializes trackers
@@ -148,10 +151,6 @@ namespace deepsea {
 
         /// updates the tracker
         void update(const Mat &img, const Mat &bin_img, const unsigned int frame_num, const VOCObject &obj);
-
-        /// Computes saliency map correlation
-        /// \param[in] img
-        // void computeSaliencyCorrelation(Mat &img);
 
         /// Computes surprise based on the surprise map
         /// \param[in] frame size the image map is cropped from
@@ -161,11 +160,9 @@ namespace deepsea {
 
         /// Checks if the tracker has predicted the event is close to the frame edge
         /// \param size size of the image the tracker output should be bound within
-        /// \param percent how close in percent of the width/height to check
+        /// \param box tracker box
         /// \return true if close
-        bool boundsCheck(const Size &size, const Rect2d &box, const float percent);
-
-        bool runHough(const Mat &img, const Mat &bin_img, Rect &box, bool reset);
+        bool boundsCheck(const Size &size, const Rect2d &box);
     };
 
 // ########### inline methods

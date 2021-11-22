@@ -34,7 +34,7 @@ add_definitions("-DGIT_BRANCH=${GIT_BRANCH}")
 find_package( Boost 1.72 COMPONENTS program_options filesystem REQUIRED )
 include_directories( ${Boost_INCLUDE_DIR} )
 find_package(XercesC 3.2.3 REQUIRED)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 4.5 REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(cppzmq 4.3.3 REQUIRED)
 

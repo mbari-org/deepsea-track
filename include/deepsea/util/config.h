@@ -33,38 +33,35 @@ namespace deepsea {
 
     public:
 
-        Config(string filename);
+        Config(const std::string filename, const std::vector<std::string> &args);
 
         Config() { init_ = false;};
 
         // example enum type declaration
         enum TrackerType {
-            TT_MEDIANFLOW,
-            TT_KCF,
-            TT_TLD,
-            TT_MOSSE,
             TT_CSRT,
-            TT_HOUGH,
+            TT_KCF,
             TT_INVALID = -1,
         };
 
         // map TrackerType values to JSON as strings
         NLOHMANN_JSON_SERIALIZE_ENUM(TrackerType, {
             { TT_INVALID, nullptr },
-            { TT_MEDIANFLOW, "MEDIANFLOW" },
-            { TT_KCF, "KCF" },
-            { TT_TLD, "TLD" },
-            { TT_MOSSE, "MOSSE" },
             { TT_CSRT, "CSRT" },
-            { TT_HOUGH, "HOUGH" },
+            { TT_KCF, "KCF" },
         });
 
         struct TrackerConfig {
             int min_event_frames;
             float score_threshold;             //! minimum score of any detection to be considered as a seed for a visual event
             float nms_threshold;               //! minimum non maximum suppression score to detect overlapping objects
+            int stride;                        //! stride to run tracker; max 5
+            bool gamma_enhance;                //! true if gamma correction applied to image preprocessor; adds processing time
             TrackerType type;
         };
+
+        // save the program configuration details to a json array
+        void save(json &j);
 
         bool isInitialized() const { return init_; }
 
@@ -76,7 +73,7 @@ namespace deepsea {
 
         int trackerWait() const { return tracker_wait_msecs_; }
 
-        TrackerConfig getTracker() const { return tracker_cfg_; }
+        TrackerConfig getTrackerCfg() const { return tracker_cfg_; }
 
         string getProgram() const { return program_info_; }
 
@@ -87,8 +84,6 @@ namespace deepsea {
 
         void printTracker(TrackerType tracker_type);
 
-        void to_json(json &j, const Config &p);
-
         void from_json(const json &j);
 
         bool init_;
@@ -97,6 +92,7 @@ namespace deepsea {
         bool display_;                      //! True if displaying output during processing
         bool create_video_;                 //! True if creating video of output during processing
         string program_info_;
+        std::vector<std::string> args_;     //! Program arguments
         TrackerConfig tracker_cfg_;
     };
 }

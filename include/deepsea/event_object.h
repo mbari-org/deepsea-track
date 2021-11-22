@@ -80,7 +80,7 @@ namespace deepsea {
 
         ///
         /// \return return total number of occluded pixels
-        inline unsigned int getOccluded() const;
+        inline float getOcclusion() const;
 
         ///
         /// \return return the unique identifier for this object
@@ -98,10 +98,10 @@ namespace deepsea {
         /// \param confidence
         void setClassConfidence(float confidence);
 
-        /// set the percent occluded - this is really not occlusion in the pixelwise sense, but rather
+        /// set the percent occluded - this is really not occlusion in the pixel sense, but rather
         /// an approximation of the percent using the percent IOU from an intersecting object
         /// \param percent
-        void setOccluded(float percent);
+        void setOcclusion(float percent);
 
         /// set the frame number this object belongs to
         /// \param frame_num
@@ -136,11 +136,11 @@ namespace deepsea {
             j = json{
                 {"uuid", boost::uuids::to_string(p.uuid_)},
                 {"bounding_box", jbox_t},
-                {"occlusion", p.getOccluded()},
+                {"occlusion", int(p.getOcclusion()*100.)},// scale and round to avoid bloat in JSON
                 {"class_name", p.getClassName()},
                 {"class_index", p.getClassIndex()},
-                {"confidence", int(p.getConfidence()*100.f) }, // round to avoid bloat in JSON
-                {"surprise",  int(p.getSurprise()/10.f)}, // round to avoid bloat in JSON
+                {"confidence", int(p.getConfidence()*100.) }, // scale and round to avoid bloat in JSON
+                {"surprise",  int(p.getSurprise()/10.)}, // scale and round to avoid bloat in JSON
                 {"frame_num", p.getFrameNum()}
                 };
         };
@@ -151,17 +151,18 @@ namespace deepsea {
         static void from_json(const json& j, EventObject& p){
             p.bbox_tracker_ = Utils::json2rect(j.at("bounding_box"));
             string uuid_str;
-            float confidence, surprise;
+            int confidence, surprise, occlusion;
             j.at("uuid").get_to(uuid_str);
             p.uuid_ = boost::lexical_cast<boost::uuids::uuid>(uuid_str);
-            j.at("occlusion").get_to(p.occlusion);
+            j.at("occlusion").get_to(occlusion);
             j.at("class_name").get_to(p.class_name_);
             j.at("class_index").get_to(p.class_index_);
-            j.at("confidence").get_to(p.class_confidence_);
-            j.at("surprise").get_to(p.surprise_);
+            j.at("confidence").get_to(confidence);
+            j.at("surprise").get_to(surprise);
             j.at("frame_num").get_to(p.frame_num_);
             p.class_confidence_ = (float) confidence/100.;
-            p.surprise_ = (float) surprise/100.;
+            p.surprise_ = (float) surprise/10.;
+            p.occlusion_ = (float) occlusion/100.;
         };
 
         /// \brief copy operator
@@ -173,7 +174,7 @@ namespace deepsea {
         Rect2d bbox_tracker_;           //! assigned/predicted bounding box in image coordinates for this object from the box tracker
         Mat mask_;                      //! binary mask with the shape of this event_object
         unsigned int frame_num_;        //! frame number at which the event_object occurred
-        float occlusion;               //! an approximation of the occlusion using the percent IOU from an intersecting object
+        float occlusion_;               //! an approximation of the occlusion using the percent IOU from an intersecting object
         string class_name_;             //! class name assigned to this object by the external classifier
         int class_index_;               //! class index assigned to this object by the external classifier
         float class_confidence_;        //! confidence from the external classifier
@@ -194,7 +195,7 @@ namespace deepsea {
     inline float EventObject::getSurprise() const { return surprise_; }
 
 // ######################################################################
-    inline unsigned int EventObject::getOccluded() const { return occlusion; }
+    inline float EventObject::getOcclusion() const { return occlusion_; }
 
 // ######################################################################
     inline unsigned int EventObject::getFrameNum() const { return frame_num_; }
@@ -212,7 +213,7 @@ namespace deepsea {
     inline void EventObject::setClassConfidence(float confidence) { class_confidence_ = confidence;  }
 
 // ######################################################################
-    inline void EventObject::setOccluded(float occlusion) { occlusion = occlusion;  }
+    inline void EventObject::setOcclusion(float occlusion) { occlusion_ = occlusion;  }
 
 // ######################################################################
     inline void EventObject::setFrameNum(const unsigned int frame_num) { frame_num_ = frame_num; }

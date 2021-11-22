@@ -7,7 +7,7 @@ namespace deepsea {
 // ######################################################################
     EventObject::EventObject()
             : bbox_tracker_(Rect(0, 0, 0, 0)),
-              occlusion(0.),
+              occlusion_(0.),
               frame_num_(0),
               class_name_("Unknown"),
               class_confidence_(-1.),
@@ -17,7 +17,7 @@ namespace deepsea {
 // ######################################################################
     EventObject::EventObject(const VOCObject &voc, const unsigned int occlusion, const unsigned int frame_num)
             : bbox_tracker_(voc.getBox()),
-              occlusion(occlusion),
+              occlusion_(occlusion),
               frame_num_(frame_num),
               class_name_(voc.getName()),
               class_confidence_(voc.getScore()),
@@ -28,7 +28,7 @@ namespace deepsea {
 // ######################################################################
     EventObject &EventObject::operator=(const EventObject &object) {
         this->bbox_tracker_ = object.bbox_tracker_;
-        this->occlusion = object.occlusion;
+        this->occlusion_ = object.occlusion_;
         this->mask_ = object.mask_;
         this->class_confidence_ = object.class_confidence_;
         this->class_name_ = object.class_name_;

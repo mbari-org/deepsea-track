@@ -35,9 +35,8 @@ namespace deepsea {
 
         /// \brief Constructor
         /// \param cfg system configuration
-        /// \param start_frame_num  starting frame to log
         /// \param out_dir output directory to log files to
-        Logger(const Config &cfg, unsigned int start_frame_num, string out_dir);
+        Logger(Config cfg, string out_dir);
 
         virtual ~Logger();
 
@@ -51,9 +50,6 @@ namespace deepsea {
                 float resize_factor_height=1.);
 
     private:
-
-        Config cfg_;                    ///! system configuration
-        unsigned int start_frame_num_;  ///! starting frame; used only during startup
         string out_dir_;                ///! output directory to log all files to
      };
 

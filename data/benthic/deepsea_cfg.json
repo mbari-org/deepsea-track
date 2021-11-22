@@ -1,10 +1,11 @@
 {
   "display": true,
   "create_video": true,
-  "display_wait_msecs": 10,
+  "display_wait_msecs": 500,
   "min_event_frames": 1,
   "nms_threshold": 0.5,
-  "score_threshold": 0.4,
-  "tracker": 0,
-  "tracker_wait_msecs": 0
+  "score_threshold": 0.1,
+  "tracker_stride": 1,
+  "tracker_wait_msecs":0,
+  "tracker_gamma_enhance": false
 }

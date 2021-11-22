@@ -94,7 +94,7 @@ e.g.
 - configuration files in /data/benthic
 - output results to mapped /data mount in the directory /data/benthic_tracks
 - *no start frame specified - start at frame 1*
-- *no stride specified - process every frame*
+- *no stride specified - process every frame; only strides detection input*
 - *no tracker_width specified - default to 512*
 - *no tracker_height specified - default to 512*
 - *no out_width specified - default to 1920*
@@ -149,7 +149,7 @@ Data is output per each frame with all events tracked per the following schema:
       },
 		
       "occlusion": {
-         "description": "Number of occluded pixels - an approximation based on intersection over union",
+         "description": "Occlusion - an approximation based on intersection over union",
          "type": "integer"
       },
 
@@ -200,19 +200,15 @@ This is human-readable descriptions and colors to associate to each class, e.g.
 ```
 
 The *deepsea_cfg.json* should contain the index for the type of tracker you'd like to use:
-These correspond to 4 of the 8 available [OpenCV](https://docs.opencv.org/) trackers.
-The recommended tracker for smooth predictable motion is the MEDIANFLOW.
+These correspond to a few available [OpenCV trackers](https://docs.opencv.org/). 
 
-| id   | Tracker           |
-|----------|---------------|
-| -1 | No tracker  |
-| 0 | MEDIANFLOW  |
-| 1 | KCF Kernelized Correlation Filter  |
-| 2 | TLD Tracking, learning and detection  |
-| 3 | MOSSE Minimum Output Sum of Squared Error  |
-| 4 | CSRT Discriminative Correlation Filter with Channel and Spatial Reliability  |
+| id   | Tracker           |  Comments |
+|----------|---------------|--------------|
+| -1 | No tracker  |  |
+| 0 | CSRT Discriminative Correlation Filter with Channel and Spatial Reliability  | Slower, but better performance than KCF |
+| 1 | KCF Kernelized Correlation Filter  | Fast, but does not handle scale changes and unpredictable movement well |
 
-e.g. this uses the MEDIANFLOW tracker and drops the second tracker:
+e.g. this uses the CSRT tracker:
 *deepsea_cfg.json*
 ```json
 {
@@ -223,20 +219,23 @@ e.g. this uses the MEDIANFLOW tracker and drops the second tracker:
   "nms_threshold": 0.5,
   "score_threshold": 0.4,
   "display_wait_msecs": 2000,
-  "tracker_wait_msecs": 10
+  "tracker_stride": 2,
+  "gamma_enhance": false
 }
 ```
 
 | field   | description           |
 |----------|---------------|
-| tracker | The tracker - must be a valid id  |
+| tracker | The tracker id - must be a valid id  |
+| tracker_stride | Run the tracker every 2 frames instead of every frame for speed-up |
+| gamma_enhance |  Gamma enhance the input video. Brightens dark videos; caution - this add processing time|
 | tracker_wait_msecs |  The time in milliseconds to pause between running the tracker on each frame; useful if detector messages are slow over zmq |
-| create_video | Set True to create a .mp4 video of the output |
-| display | Set True to see the frame output displayed while running |
-| display_wait_msecs | The time in milliseconds to wait to while displaying the frame output |
-| min_event_frames | Only VisualEvents greater than this number of frames are stored; used to remove short invalid tracks |
+| create_video | Set *true* to create a .mp4 video of the output; caution - this adds processing time |
+| display | Set *true* to see the frame output displayed while running |
+| display_wait_msecs | The time in milliseconds to wait to while displaying the frame output. Useful for debugging. |
+| min_event_frames | Only VisualEvents greater than this number of frames are stored; used to remove short invalid tracks. |
 | nms_threshold | The minimum score for the non maximum supression algorithm.  If nms_threshold is set too low, e.g. 0.1, it will not detect overlapping objects of same or different classes; set too high e.g. 1, will return multiple boxes for the same object. |
-| score_threshold | The minimum score for detections |
+| score_threshold | The minimum score for detections. Set this low to allow more weak detections. |
 
 # Building
 
@@ -254,13 +253,9 @@ Note that the CMake files in this project require version 3.15 or higher
 brew install boost
 brew tap nlohmann/json
 brew install nlohmann/json
-brew install zeromq
-cd thirdparty && 
-curl -O https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.3.tar.gz &&
-tar -zxvf xerces-c-3.2.3.tar.gz &&
-cd xerces-c-3.2.3 && \
-    ./configure CFLAGS="-arch x86_64" CXXFLAGS="-arch x86_64" &&
-    make -j8 && make install
+brew install cppzmq
+brew install opencv
+brew install xerces
 ```
 
 ## Roadmap

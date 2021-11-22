@@ -53,7 +53,7 @@ int main( int argc, char** argv ) {
     //////////////////////////////////////////////////////////
     // initialize classes and variables
     int frame_num;
-    Mat frame, frame_enhanced, frame_resized;
+    Mat frame, frame_pre, frame_resized;
     ConfigMaps cfg_map;
     VideoCapture cap(args.video_path_);
     int frame_width  = cap.get(CAP_PROP_FRAME_WIDTH);
@@ -70,22 +70,25 @@ int main( int argc, char** argv ) {
         cap.set(CAP_PROP_POS_FRAMES, args.start_frame_num_);
     frame_num = args.start_frame_num_;
     stringstream ss;
-    ss << boost::format("%s/%s_results.mp4") % args.out_path_ % filesystem::path(args.video_path_).stem().c_str();
+    ss << boost::format("%s/%s_results.mp4") % args.out_path_ % std::filesystem::path(args.video_path_).stem().c_str();
     VideoWriter out(ss.str(),
                     VideoWriter::fourcc('H', '2', '6', '4'),
                     fps, Size(frame_width, frame_height));
     Size scaled_size(Size(tracker_width, tracker_height));
-    Preprocess pre(scaled_size, 3, args.video_path_);
 
     //////////////////////////////////////////////////////////
     // get configuration
     cout << "Parsing configuration " << args.cfg_path_ << "deepsea_class_map.json" << endl;
     assert(initConfigMaps(args.cfg_path_ + "deepsea_class_map.json", cfg_map));
     cout << "Parsing configuration" << args.cfg_path_ << "deepsea_cfg.json" << endl;
-    Config cfg(args.cfg_path_ + "deepsea_cfg.json");
+    std::vector<std::string> args_list;
+    for(int i=0;i<argc;i++)
+        args_list.push_back(argv[i]);
+    Config cfg(args.cfg_path_ + "deepsea_cfg.json", args_list);
     assert(cfg.isInitialized());
-    Logger log(cfg, frame_num, args.out_path_);
+    Logger log(cfg, args.out_path_);
     VisualEventManager manager(cfg, cfg_map);
+    Preprocess pre(scaled_size, cfg.getTrackerCfg().gamma_enhance, 3, args.video_path_);
 
     //////////////////////////////////////////////////////////
     // if loading from precomputed detections in xml files, initialize the parser
@@ -115,7 +118,7 @@ int main( int argc, char** argv ) {
     while(cap.read(frame)) {
 
         list<VisualEvent *> events_last = manager.getEvents(frame_num - 1);
-	string summary = cv::format("Processing frame %06d FPS %2.4f VisualEvents %03d", frame_num, fps, events_last.size());
+	    string summary = cv::format("Processing frame %06d FPS %2.4f VisualEvents %03lu", frame_num, fps, events_last.size());
         cout << "====================== " << summary << " ====================== " << endl;
 
         // if loading detections over zmq, wait for start
@@ -133,7 +136,10 @@ int main( int argc, char** argv ) {
             // if have voc formatted xml, read detections from files
             if (args.hasXml()) {
                 parser->resetDocumentPool();
-                string xml_filename = cv::format("%s/f%06d.xml", args.xml_path_.c_str() , frame_num);
+
+                // to support the output format deepsort track outputs in string xml_filename = cv::format("%s/frame_%d.xml", args.xml_path_.c_str() , frame_num);
+                string format = cv::format("%s/%s", args.xml_path_.c_str() , args.xml_format_.c_str());
+                string xml_filename = cv::format(format.c_str(), frame_num);
 
                 if (Utils::doesPathExist(xml_filename)) {
                     parser->parse(xml_filename.c_str());
@@ -143,7 +149,7 @@ int main( int argc, char** argv ) {
                     // rescale and store VOCObjects in VisualObjects
                     list<VOCObject>::iterator itvoc;
                     for (itvoc = voc_objs.begin(); itvoc != voc_objs.end(); ++itvoc) {
-                        Rect2d  r = (*itvoc).getBox();
+                        Rect2d r = (*itvoc).getBox();
                         r.x = int(r.x * width_factor);
                         r.y = int(r.y * height_factor);
                         r.width = int(r.width * width_factor);
@@ -154,12 +160,18 @@ int main( int argc, char** argv ) {
                     }
                 }
             }
-            else { // otherwise read detections sent over zmq
+            else { // otherwise, read detections sent over zmq
                 event_objs = zmq.getObjects(frame_num);
             }
         }
 
- 	// if no detections, no visual object, we aren't creating a video, skip to the next frame
+        double timer = (double)getTickCount();
+        resize(frame, frame_resized, Size(), 1. / resize_frame_factor_width, 1. / resize_frame_factor_height);
+
+        frame_pre = pre.update(frame_resized);
+
+        // if no detections, the current frame number is past that messaged, no visual objects,
+        // and not creating a video, skip to the next frame
         if (cfg.trackerWait() > 0
             && frame_num > zmq.lastFrameNum()
             && event_objs.size() == 0
@@ -169,17 +181,11 @@ int main( int argc, char** argv ) {
             continue;
         }
 
-        double timer = (double)getTickCount();
-        resize(frame, frame_resized, Size(), 1. / resize_frame_factor_width, 1. / resize_frame_factor_height);
-
-        // enhance
-        frame_enhanced = pre.update(frame_resized);
-
         Mat gray, hsv, lab, color, laser_mask, mask, rescaled_img;
-        Mat binary_mask = pre.getDiffMean(frame_enhanced);
+        Mat binary_mask = pre.getDiffMean(frame_pre);
 
         // run the manager and time it
-        manager.run(event_objs, frame_enhanced, binary_mask, frame_num);
+        manager.run(event_objs, frame_pre, binary_mask, frame_num);
         fps = getTickFrequency() / (getTickCount() - timer);
 
         // get list of visual objects
@@ -198,7 +204,7 @@ int main( int argc, char** argv ) {
 
                 EventObject evt_obj = (*itve)->getLatestObject();
 
-                // rescale boxes if tracking on reduced frame size
+                // rescale boxes if tracking on a reduced frame size
                 Rect2d bbox = evt_obj.getBboxTracker();
                 Rect2d bbox_tracker = Utils::rescale(resize_frame_factor_width, resize_frame_factor_height, bbox);
 
@@ -221,13 +227,13 @@ int main( int argc, char** argv ) {
                 Utils::decorate(frame, bbox_tracker, color, short_uuid, description, 4, 0.7);
             }
 
-//            string msg = cv::format("FPS: %2.4f frame: %06d", fps, frame_num);
-            string msg = cv::format("frame: %06d", frame_num);
+            string msg = cv::format("FPS: %2.4f frame: %06d", fps, frame_num);
             putText(frame, msg.c_str(), Point(int(0.025 * frame_width), int(0.025 * frame_height)),
                     FONT_HERSHEY_SIMPLEX, 0.5, Scalar(53, 200, 243), 1);
+
             if (cfg.display()) {
-                imshow("track", frame);
-                imshow("enhanced", frame_enhanced);
+                imshow("results", frame);
+                imshow("preprocessed input", frame_pre);
                 if (waitKey(cfg.displayWait()) == 27) // quit on ESC button
                     break;
             }

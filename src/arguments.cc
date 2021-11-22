@@ -59,12 +59,16 @@ namespace deepsea {
                         "socket address for the detector output, e.g. tcp://127.0.0.1:6432")
                 ("topic", po::value<string>(&topic_),
                         "topic to listen on at address, e.g. VisualEvents ")
+                ("xml_format", po::value<string>(&xml_format_)->default_value("f%06d.xml"),
+                        "format of the xml input files. defaults to f%06d.xml")
                 ;
 
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
         po::notify(vm);
         struct stat buffer;
+
+        // TODO: add a check for a valid starting xml input file here per the xml_format flag
 
         if (vm.count("help")) {
             cout << desc << "\n";
