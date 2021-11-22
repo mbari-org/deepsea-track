@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+## [1.16.3](http://bitbucket.org/mbari/deepsea-track/compare/v1.16.2...v1.16.3) (2021-11-22)
+
+
+### Performance Improvements
+
+*  added fast tracker wrapper, optional gamma for speed-up, removed unused code, log programs args, removed MEDIANFLOW/TLD/MOSSE trackers. ([63b89e1](http://bitbucket.org/mbari/deepsea-track/commits/63b89e1df15b09a75f36b5919ec9893f25f5da40))
+
 ## [1.16.2](http://bitbucket.org/mbari/deepsea-track/compare/v1.16.1...v1.16.2) (2021-11-05)
 
 
