@@ -1,0 +1,5 @@
+./thirdparty
+./extern
+./opencv
+./onnxruntime
+./build
