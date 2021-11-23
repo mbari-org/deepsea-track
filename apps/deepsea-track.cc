@@ -70,7 +70,7 @@ int main( int argc, char** argv ) {
         cap.set(CAP_PROP_POS_FRAMES, args.start_frame_num_);
     frame_num = args.start_frame_num_;
     stringstream ss;
-    ss << boost::format("%s/%s_results.mp4") % args.out_path_ % std::filesystem::path(args.video_path_).stem().c_str();
+    ss << boost::format("%s/%s_results.mp4") % args.out_path_ % boost::filesystem::path(args.video_path_).stem().c_str();
     VideoWriter out(ss.str(),
                     VideoWriter::fourcc('H', '2', '6', '4'),
                     fps, Size(frame_width, frame_height));

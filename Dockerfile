@@ -36,6 +36,7 @@ RUN curl -L https://github.com/opencv/opencv/archive/4.5.0.tar.gz --output openc
     -D WITH_TBB=ON \
     -D WITH_OPENMP=ON \
     -D WITH_IPP=ON \
+    -D BUILD_TIFF=ON \
     -D CMAKE_INSTALL_PREFIX=/usr/ \
     -D BUILD_EXAMPLES=OFF \
     -D BUILD_DOCS=OFF \

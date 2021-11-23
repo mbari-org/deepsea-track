@@ -1,0 +1,34 @@
+FROM thecanadianroot/opencv-cuda:ubuntu20.04-cuda11.3.1-opencv4.5.2
+# ================================================================
+# Docker Image for mbari/deepsea-track
+# ================================================================
+
+MAINTAINER Peyton Lee <plee@mbari.org>, Danelle Cline <dcine@mbari.org>
+
+# Get dependencies
+RUN apt-get update --fix-missing && \
+    apt-get install -y build-essential cmake git pkg-config python3-dev python3-numpy curl libboost-all-dev libxerces-c-dev libzmq3-dev
+
+WORKDIR /tmp/build
+
+RUN curl -L https://github.com/nlohmann/json/archive/v3.9.1.tar.gz --output v3.9.1.tar.gz && \
+    tar -xzf v3.9.1.tar.gz && cd json-3.9.1 && \
+    cmake . && make -j8 && make install
+
+RUN curl -L https://github.com/zeromq/cppzmq/archive/v4.7.1.tar.gz --output v4.7.1.tar.gz && \
+    tar -xzf v4.7.1.tar.gz && cd cppzmq-4.7.1 && \
+    cmake -DCPPZMQ_BUILD_TESTS=OFF . && make -j8 && make install
+
+# Build the deepsea-track repository
+COPY . /tmp/build
+
+RUN cmake --version && \
+    cmake ./ && \
+    make && cp apps/deepsea-track /usr/local/bin/
+
+# Clean-up
+RUN rm -rf /tmp/build
+
+WORKDIR /app
+
+ENTRYPOINT ["/usr/local/bin/deepsea-track"]

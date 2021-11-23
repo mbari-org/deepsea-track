@@ -3,3 +3,7 @@
 ./opencv
 ./onnxruntime
 ./build
+./doc
+./data
+*.onnx
+*.tar.gz
