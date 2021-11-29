@@ -7,3 +7,5 @@
 ./data
 *.onnx
 *.tar.gz
+./__pycache__
+./cmake*
