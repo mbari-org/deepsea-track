@@ -89,6 +89,8 @@ int main( int argc, char** argv ) {
     Logger log(cfg, args.out_path_);
     VisualEventManager manager(cfg, cfg_map);
     Preprocess pre(scaled_size, cfg.getTrackerCfg().gamma_enhance, 3, args.video_path_);
+    if (!cfg.createVideo())
+        out.release();
 
     //////////////////////////////////////////////////////////
     // if loading from precomputed detections in xml files, initialize the parser
@@ -254,6 +256,8 @@ int main( int argc, char** argv ) {
 
         if (zmq.initialized())
             zmq.cleanUp(frame_num);
+
+        frame.release();
     }
 
     cout << "Done!" << endl;

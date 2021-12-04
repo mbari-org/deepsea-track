@@ -26,7 +26,7 @@ namespace deepsea {
         if(region.width>img.cols)region.width=img.cols;
         if(region.height>img.rows)region.height=img.rows;
 
-        patch = img(region).clone();
+        patch = img(region);
         cvtColor(patch,patch, COLOR_RGB2GRAY);
 
         // add some padding to compensate when the patch is outside image border
@@ -58,7 +58,7 @@ namespace deepsea {
         if(region.width>img.cols)region.width=img.cols;
         if(region.height>img.rows)region.height=img.rows;
 
-        patch = img(region).clone();
+        patch = img(region);
         cvtColor(patch,patch, COLOR_RGB2GRAY);
 
         Mat resized_image;
