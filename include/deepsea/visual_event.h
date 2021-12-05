@@ -174,6 +174,8 @@ namespace deepsea {
 
 // ######################################################################
     inline void VisualEvent::close() {
+        if (tracker_ != NULL)
+            tracker_.release();
         state_ = CLOSED;
         ostringstream ss;
         EventObject latest = objects_.back();

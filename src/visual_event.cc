@@ -34,11 +34,9 @@ namespace deepsea {
         tracker_ = NULL;
         pad_ = int(BOUNDS_PERCENT * img.size().width);
         objects_.push_back(evt_obj);
-        Mat img_clone = img.clone();
-        Mat crop = img_clone(evt_obj.getBboxTracker());
+        Mat crop = img(evt_obj.getBboxTracker());
         alg_ = StaticSaliencyFineGrained::create();
         computeSurprise(img.size(), crop);
-        img_clone.release();
         if (tracker_cfg_.min_event_frames == 1 || tracker_cfg_.min_event_frames == 0) {
             state_ = VALID;
         }
@@ -63,7 +61,6 @@ namespace deepsea {
                      << " Too close to edge to start tracker1" << endl;
                 tracker_init_ = false;
                 tracker_failed_ = true;
-                tracker_.release();
                 close();
                 return;
             }
@@ -308,7 +305,7 @@ namespace deepsea {
     Ptr<Tracker> VisualEvent::createTracker() {
 
         if (tracker_cfg_.type == Config::TT_KCF || tracker_cfg_.type == Config::TT_CSRT ) {
-            return FastTracker::create(tracker_cfg_, objects_.back().getOcclusion());
+            return FastTracker::create(tracker_cfg_, objects_.back().getOcclusion(), objects_.back().getBboxTracker());
         }
         else if (tracker_cfg_.type == Config::TT_INVALID) {
             cout << "invalid tracker type" << endl;
