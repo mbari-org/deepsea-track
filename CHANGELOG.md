@@ -1,5 +1,18 @@
 # DeepSea Track Changelog
 
+# [1.17.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.16.3...v1.17.0) (2021-12-05)
+
+
+### Features
+
+* initial check-in ([12ec2bb](http://bitbucket.org/mbari/deepsea-track/commits/12ec2bb62430062c81b4f5b8bec1a4142fa78096))
+
+
+### Performance Improvements
+
+* dynamic template sizing and other minor memory mgmt improvements ([e7ac867](http://bitbucket.org/mbari/deepsea-track/commits/e7ac867a1e2945454cbc5778f719e49b5791414b))
+* dynamic template sizing and other minor memory mgmt improvements ([524692f](http://bitbucket.org/mbari/deepsea-track/commits/524692fe9a9bd0eac5e4a363b221417a41f4206f))
+
 ## [1.16.3](http://bitbucket.org/mbari/deepsea-track/compare/v1.16.2...v1.16.3) (2021-11-22)
 
 
