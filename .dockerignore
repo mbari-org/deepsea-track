@@ -1,0 +1,11 @@
+./thirdparty
+./extern
+./opencv
+./onnxruntime
+./build
+./doc
+./data
+*.onnx
+*.tar.gz
+./__pycache__
+./cmake*

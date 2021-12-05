@@ -70,7 +70,7 @@ int main( int argc, char** argv ) {
         cap.set(CAP_PROP_POS_FRAMES, args.start_frame_num_);
     frame_num = args.start_frame_num_;
     stringstream ss;
-    ss << boost::format("%s/%s_results.mp4") % args.out_path_ % std::filesystem::path(args.video_path_).stem().c_str();
+    ss << boost::format("%s/%s_results.mp4") % args.out_path_ % boost::filesystem::path(args.video_path_).stem().c_str();
     VideoWriter out(ss.str(),
                     VideoWriter::fourcc('H', '2', '6', '4'),
                     fps, Size(frame_width, frame_height));
@@ -89,6 +89,8 @@ int main( int argc, char** argv ) {
     Logger log(cfg, args.out_path_);
     VisualEventManager manager(cfg, cfg_map);
     Preprocess pre(scaled_size, cfg.getTrackerCfg().gamma_enhance, 3, args.video_path_);
+    if (!cfg.createVideo())
+        out.release();
 
     //////////////////////////////////////////////////////////
     // if loading from precomputed detections in xml files, initialize the parser
@@ -254,6 +256,8 @@ int main( int argc, char** argv ) {
 
         if (zmq.initialized())
             zmq.cleanUp(frame_num);
+
+        frame.release();
     }
 
     cout << "Done!" << endl;

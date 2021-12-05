@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  arm64:
+    image: mbari/deepsea-track:ubuntu20.04-cuda11.3.1-arm64
+    build:
+      context: .
+      dockerfile: ./Dockerfile.arm
+  amd64:
+    image: mbari/deepsea-track:ubuntu20.04-cuda11.3.1-amd64
+    build:
+      context: .
+      dockerfile: ./Dockerfile.amd

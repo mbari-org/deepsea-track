@@ -34,7 +34,7 @@ namespace deepsea {
     }
 
 // ######################################################################
-    Ptr<Tracker> FastTracker::create(const Config::TrackerConfig config, const float occlusion)
+    Ptr<Tracker> FastTracker::create(const Config::TrackerConfig config, const float occlusion, const Rect& boundingBox)
     {
         if (config.type == Config::TT_KCF) {
             cout << "Initializing KCF tracker" << endl;
@@ -59,7 +59,8 @@ namespace deepsea {
             param.use_hog = true;
             param.use_rgb = true;
             param.use_gray = false;
-            param.template_size = 70;  // for speed-up; default is 200
+            int template_size = min(4*max(boundingBox.height, boundingBox.width), 250); // scale up for larger objects
+            param.template_size = max(70, template_size);  // for speed-up; default is 200
             param.admm_iterations = 2;  // for speed-up; default is 4
             cout << "Initializing CSRT tracker" << endl;
             return makePtr<FastTracker>(TrackerCSRT::create(param), config.stride);

@@ -10,8 +10,9 @@ using namespace cv;
 
 namespace deepsea {
 
-    Preprocess::Preprocess(const Size dims, unsigned int cache_size, string video)
+    Preprocess::Preprocess(const Size dims, const bool gamma_enhance, unsigned int cache_size, string video)
             : num_processed_(0),
+              gamma_enhance_(gamma_enhance),
               entropy_(0.),
               cache_(cache_size) {
         for (int i = 0; i < 256; i++) pdf_[i] = 0.F;
@@ -57,38 +58,41 @@ namespace deepsea {
     }
 
     Mat Preprocess::update(const Mat &img) {
-        // if first frame update gamma correction curve
-        if (cache_.size() == 0) {
-            updateGammaCurve(img, true);
-        } else {
-            // update model on entropy shifts
-            if (num_processed_ == 0) {
-                float entropy = computeEntropy(img);
-
-                if (!isinf(entropy) && !isnan(entropy)) {
-                    float diff = abs(entropy - entropy_);
-                    if (diff > 3.0) {
-                        printf("Frame: %d Updating gamma curve. Entropy diff %f \n", num_processed_, diff);
-                        updateGammaCurve(img, true);
-                    }
-                    entropy_ = entropy;
-                }
-            }
-            updateGammaCurve(img, false);
-        }
         Mat gray, hsv, lab, color, laser_mask;
         cvtColor(img, hsv, COLOR_RGB2HSV);
         cvtColor(img, gray, COLOR_RGB2GRAY);
-
         Vec3b *ptr_hsv;
-        for (int r = 0; r < hsv.rows; r++) {
-            ptr_hsv = hsv.ptr<Vec3b>(r);
-            for (int c = 0; c < hsv.cols; c++) {
-                float gamma = 1 - cdfw_[int(gray.at<uchar>(r, c))];
-                // apply gamma in the value only, preserving hue and saturation
-                ptr_hsv[c] = Vec3b(ptr_hsv[c][0], ptr_hsv[c][1], int(255 * pow(ptr_hsv[c][2] / 255.0F, gamma)));
+
+        if (gamma_enhance_) {
+            // if first frame update gamma correction curve
+            if (cache_.size() == 0) {
+                updateGammaCurve(img, true);
+            } else {
+                // update model on entropy shifts
+                if (num_processed_ == 0) {
+                    float entropy = computeEntropy(img);
+
+                    if (!isinf(entropy) && !isnan(entropy)) {
+                        float diff = abs(entropy - entropy_);
+                        if (diff > 3.0) {
+                            printf("Frame: %d Updating gamma curve. Entropy diff %f \n", num_processed_, diff);
+                            updateGammaCurve(img, true);
+                        }
+                        entropy_ = entropy;
+                    }
+                }
+                updateGammaCurve(img, false);
             }
-        }
+
+            for (int r = 0; r < hsv.rows; r++) {
+                ptr_hsv = hsv.ptr<Vec3b>(r);
+                for (int c = 0; c < hsv.cols; c++) {
+                    float gamma = 1 - cdfw_[int(gray.at<uchar>(r, c))];
+                    // apply gamma in the value only, preserving hue and saturation
+                    ptr_hsv[c] = Vec3b(ptr_hsv[c][0], ptr_hsv[c][1], int(255 * pow(ptr_hsv[c][2] / 255.0F, gamma)));
+                }
+            }
+        } // end gamma correct
 
         cvtColor(hsv, color, COLOR_HSV2RGB);
         cvtColor(color, lab, COLOR_RGB2Lab);

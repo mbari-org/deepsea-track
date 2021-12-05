@@ -7,8 +7,7 @@ project(deepsea-track VERSION 1.0 DESCRIPTION "MBARI Deep Sea Tracker" LANGUAGES
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_SOURCE_DIR src)
 set(CMAKE_THIRDPARTY_SOURCE_DIR extern)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread -O0 -fno-omit-frame-pointer")
 #######################################
 # Setup auto generation for GIT hash
 #######################################
@@ -31,11 +30,11 @@ add_definitions("-DGIT_BRANCH=${GIT_BRANCH}")
 #######################################
 # Find installed dependencies
 #######################################
-find_package( Boost 1.72 COMPONENTS program_options filesystem REQUIRED )
+find_package( Boost COMPONENTS program_options filesystem REQUIRED )
 include_directories( ${Boost_INCLUDE_DIR} )
-find_package(XercesC 3.2.3 REQUIRED)
+find_package(XercesC 3 REQUIRED)
 find_package(OpenCV 4.5 REQUIRED)
-find_package(nlohmann_json 3.2.0 REQUIRED)
+find_package(nlohmann_json 3 REQUIRED)
 find_package(cppzmq 4.3.3 REQUIRED)
 
 #######################################

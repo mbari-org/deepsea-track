@@ -30,7 +30,7 @@ namespace deepsea {
 
     class Preprocess {
     public:
-        Preprocess(const Size dims, unsigned int cache_size = 1, string video = NULL);
+        Preprocess(const Size dims, const bool gamma_enhance = false, unsigned int cache_size = 1, string video = NULL);
 
         virtual ~Preprocess();
 
@@ -49,6 +49,7 @@ namespace deepsea {
         std::map<int, double> pdf_;
         std::map<int, double> cdfw_;
         float entropy_;                                             //! last entropy
+        bool gamma_enhance_;                                        //! true if applying gamma enhancement
         ImageCache<Mat3f> cache_;                                   //! cache to use when computing mean
     };
 }

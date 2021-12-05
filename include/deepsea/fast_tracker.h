@@ -33,7 +33,7 @@ namespace deepsea {
     class FastTracker : public Tracker
     {
     public:
-        static Ptr<Tracker> create(const Config::TrackerConfig config, const float occluded);
+        static Ptr<Tracker> create(const Config::TrackerConfig config, const float occluded, const Rect& boundingBox);
 
         FastTracker(const Ptr<Tracker>& tracker, const int stride);
 

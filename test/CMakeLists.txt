@@ -1,9 +1,9 @@
 # Find installed dependencies
-find_package( Boost 1.72 COMPONENTS program_options REQUIRED )
+find_package( Boost 1.7 COMPONENTS program_options REQUIRED )
 include_directories( ${Boost_INCLUDE_DIR} )
-find_package(XercesC 3.2.3 REQUIRED)
-find_package(OpenCV REQUIRED)
-find_package(nlohmann_json 3.2.0 REQUIRED)
+find_package(XercesC 3 REQUIRED)
+find_package(OpenCV 4.5 REQUIRED)
+find_package(nlohmann_json 3 REQUIRED)
 include_directories(/usr/local/include/)
 
 #add_executable(test_xercesc test_xercesc.cc)

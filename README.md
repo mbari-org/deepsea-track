@@ -244,7 +244,7 @@ This can be build from source with:
 
 ## Docker
 ```
-docker build -t deepsea-track .
+docker build -t deepsea-track -f Dockerfile.amd .
 ```
 
 ## Mac OSX Native
