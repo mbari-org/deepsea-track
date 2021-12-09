@@ -1,7 +1,12 @@
+.DS_Store
 .idea/
 build/
 extern/
 data/
+opencv/
 cmake-build-debug/
 cmake-build-release/
+cmake-build-debug-coverage/
 include/deepsea/version.h
+thirdparty/
+onnxruntime/
