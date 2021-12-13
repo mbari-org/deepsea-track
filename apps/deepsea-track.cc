@@ -22,7 +22,6 @@
 #include <opencv2/core/ocl.hpp>
 #include <iostream>
 #include <string>
-#include <thread>
 #include <unistd.h>
 #include <boost/filesystem.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -72,7 +71,7 @@ int main( int argc, char** argv ) {
     stringstream ss;
     ss << boost::format("%s/%s_results.mp4") % args.out_path_ % boost::filesystem::path(args.video_path_).stem().c_str();
     VideoWriter out(ss.str(),
-                    VideoWriter::fourcc('H', '2', '6', '4'),
+                    VideoWriter::fourcc('m', 'p', '4', 'v'),
                     fps, Size(frame_width, frame_height));
     Size scaled_size(Size(tracker_width, tracker_height));
 
@@ -104,31 +103,24 @@ int main( int argc, char** argv ) {
         }
         parser = new XercesDOMParser;
     }
-    //////////////////////////////////////////////////////////
-    // if loading detections over zmq, launch thread as daemon to listen for events
+
     ZMQListener zmq(args.address_, args.topic_, tracker_width, tracker_height);
-    thread zmqThread = thread();
-    if (zmq.initialized()) {
-        thread zmqThread(&ZMQListener::listen, &zmq);
-        zmqThread.detach();
-    }
 
     //////////////////////////////////////////////////////////
     // begin processing
     cout << "Starting " << cfg.getProgram() << " , press ESC to quit" << endl;
+
+    // if loading detections over zmq, wait for start
+    if (zmq.valid()) {
+        cout << "waiting for zmq messages to  start" << endl;
+        zmq.init();
+    }
 
     while(cap.read(frame)) {
 
         list<VisualEvent *> events_last = manager.getEvents(frame_num - 1);
 	    string summary = cv::format("Processing frame %06d FPS %2.4f VisualEvents %03lu", frame_num, fps, events_last.size());
         cout << "====================== " << summary << " ====================== " << endl;
-
-        // if loading detections over zmq, wait for start
-        if (zmq.initialized())
-            while (!zmq.started()) {
-                cout << "waiting for zmq messages to  start" << endl;
-                usleep(zmq_delay_microsecs);
-            }
 
         list<EventObject> event_objs;
         list<VOCObject> voc_objs;
@@ -163,7 +155,7 @@ int main( int argc, char** argv ) {
                 }
             }
             else { // otherwise, read detections sent over zmq
-                event_objs = zmq.getObjects(frame_num);
+                zmq.listen(event_objs, frame_num);
             }
         }
 
@@ -175,7 +167,6 @@ int main( int argc, char** argv ) {
         // if no detections, the current frame number is past that messaged, no visual objects,
         // and not creating a video, skip to the next frame
         if (cfg.trackerWait() > 0
-            && frame_num > zmq.lastFrameNum()
             && event_objs.size() == 0
             && events_last.size() == 0
             && (cfg.display() || cfg.createVideo()) ) {
@@ -247,16 +238,7 @@ int main( int argc, char** argv ) {
 
         frame_num +=1;
         voc_objs.clear();
-
-        // only pause if current frame is beyond the frame from the last message
-        if (cfg.trackerWait() > 0 && frame_num > zmq.lastFrameNum()) {
-            cout << "====================== Pausing tracker " << cfg.trackerWait() << " msecs ====================== " << endl;
-            usleep(cfg.trackerWait() * 1000);
-        }
-
-        if (zmq.initialized())
-            zmq.cleanUp(frame_num);
-
+        event_objs.clear();
         frame.release();
     }
 
@@ -264,6 +246,5 @@ int main( int argc, char** argv ) {
     cap.release();
     out.release();
     destroyAllWindows();
-    assert(!zmqThread.joinable());
     return 0;
 }
