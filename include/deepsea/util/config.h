@@ -71,8 +71,6 @@ namespace deepsea {
 
         int displayWait() const { return display_wait_msecs_; }
 
-        int trackerWait() const { return tracker_wait_msecs_; }
-
         TrackerConfig getTrackerCfg() const { return tracker_cfg_; }
 
         string getProgram() const { return program_info_; }
@@ -88,7 +86,6 @@ namespace deepsea {
 
         bool init_;
         int display_wait_msecs_;            //! Display wait time in milliseconds
-        int tracker_wait_msecs_;            //! Tracker wait time in microseconds
         bool display_;                      //! True if displaying output during processing
         bool create_video_;                 //! True if creating video of output during processing
         string program_info_;

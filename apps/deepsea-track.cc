@@ -58,7 +58,6 @@ int main( int argc, char** argv ) {
     int frame_width  = cap.get(CAP_PROP_FRAME_WIDTH);
     int frame_height = cap.get(CAP_PROP_FRAME_HEIGHT);
     float fps = cap.get(CAP_PROP_FPS);
-    int zmq_delay_microsecs = 5*1e6; // 5 seconds
     float tracker_width = float(args.tracker_width_) ;
     float tracker_height = float(args.tracker_height_) ;
     float resize_frame_factor_width = float(frame_width) / float(args.tracker_width_) ;
@@ -166,8 +165,7 @@ int main( int argc, char** argv ) {
 
         // if no detections, the current frame number is past that messaged, no visual objects,
         // and not creating a video, skip to the next frame
-        if (cfg.trackerWait() > 0
-            && event_objs.size() == 0
+        if (event_objs.size() == 0
             && events_last.size() == 0
             && (cfg.display() || cfg.createVideo()) ) {
             frame_num +=1;

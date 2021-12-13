@@ -16,7 +16,6 @@ namespace deepsea {
         tracker_cfg_.nms_threshold = j.at("nms_threshold");
         j.at("min_event_frames").get_to(tracker_cfg_.min_event_frames);
         j.at("display_wait_msecs").get_to((display_wait_msecs_));
-        j.at("tracker_wait_msecs").get_to((tracker_wait_msecs_));
         j.at("display").get_to((display_));
         j.at("create_video").get_to((create_video_));
     }
@@ -51,7 +50,6 @@ namespace deepsea {
     Config::Config(const std::string filename, const std::vector<std::string> &args) {
         init_ = false;
         display_wait_msecs_ = 250;
-        tracker_wait_msecs_ = 100;
         display_ = true;
         args_ = args;
         create_video_ = false;
@@ -82,7 +80,6 @@ namespace deepsea {
         this->tracker_cfg_ = cfg.tracker_cfg_;
         this->program_info_ = cfg.program_info_;
         this->display_wait_msecs_ = cfg.display_wait_msecs_;
-        this->tracker_wait_msecs_ = cfg.tracker_wait_msecs_;
         this->display_ = cfg.display_;
         this->create_video_ = cfg.create_video_;
         return *this;
