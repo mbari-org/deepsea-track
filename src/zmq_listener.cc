@@ -27,6 +27,8 @@ namespace deepsea {
 
 // ######################################################################
     ZMQListener::~ZMQListener() {
+        if (this->started_)
+            subscriber_.disconnect(address_);
     }
 
 // ######################################################################
