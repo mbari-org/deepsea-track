@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+## [1.17.2](http://bitbucket.org/mbari/deepsea-track/compare/v1.17.1...v1.17.2) (2021-12-14)
+
+
+### Bug Fixes
+
+* disconnect subscriber on exit ([eff17f1](http://bitbucket.org/mbari/deepsea-track/commits/eff17f1eb72c3e69bbd7bef1ad3473c746abaa28))
+
 ## [1.17.1](http://bitbucket.org/mbari/deepsea-track/compare/v1.17.0...v1.17.1) (2021-12-14)
 
 
