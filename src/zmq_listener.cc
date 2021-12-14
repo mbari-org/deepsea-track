@@ -71,26 +71,26 @@ namespace deepsea {
                         cout << vocs << endl;
                         cout << vocs.size() << endl;
                         for (int i=0; i < vocs.size(); i++) {
-                            if (vocs[i].is_object() && target_frame_num == vocs[i]["frame_num"]) {
+                            string frame_num = vocs[i]["frame_num"];
+                            unsigned int recvd_frame = (unsigned int )std::stoi(frame_num);
+                            if (vocs[i].is_object() && target_frame_num == recvd_frame) {
                                 string xmn = vocs[i]["xmin"]; xmin = std::stof(xmn);
                                 string xmx = vocs[i]["xmax"]; xmax = std::stof(xmx);
                                 string ymn = vocs[i]["ymin"]; ymin = std::stof(ymn);
                                 string ymx = vocs[i]["ymax"]; ymax = std::stof(ymx);
                                 string class_name = vocs[i]["class_name"];
                                 string score = vocs[i]["class_score"]; class_score = std::stof(score);
-                                string frame_num = vocs[i]["frame_num"];
-                                unsigned int frame = (unsigned int )std::stoi(frame_num);
                                 // rescale and store in EventObject
                                 Rect box = Rect(int(tracker_width_*xmin),
                                                 int(tracker_height_*ymin),
                                                 int(tracker_width_*(xmax - xmin)),
                                                 int(tracker_height_*(ymax - ymin)));
                                 VOCObject v(class_name, class_score, box);
-                                objects.push_back(EventObject(v, 0, frame));
+                                objects.push_back(EventObject(v, 0, target_frame_num));
                             }
                         }
                     }
-                    cout << "Found " << objects.size() << " objects" << endl;
+                    cout << "Received " << objects.size() << " objects" << " for topic " << topic_ << " on " << address_ << " frame " << target_frame_num << endl;
                     return;
                 }
             }
