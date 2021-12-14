@@ -1,5 +1,19 @@
 # DeepSea Track Changelog
 
+## [1.17.1](http://bitbucket.org/mbari/deepsea-track/compare/v1.17.0...v1.17.1) (2021-12-14)
+
+
+### Bug Fixes
+
+* correct frame number cast to int and check ([cd64a8d](http://bitbucket.org/mbari/deepsea-track/commits/cd64a8d32078f77dfd7fa19d6405c1adfe49c185))
+* remove blocking code ([2bcccd4](http://bitbucket.org/mbari/deepsea-track/commits/2bcccd4ca9ee85ee89ddb80e8a79af0c3f8d8def))
+
+
+### Performance Improvements
+
+* experimental rework of zmq ([94c4453](http://bitbucket.org/mbari/deepsea-track/commits/94c44533ef66af8a90037218da3ca87bffef5e90))
+* removed tracker wait ([1c75d19](http://bitbucket.org/mbari/deepsea-track/commits/1c75d1912b3647003e7d57f0de786ed2209520a1))
+
 # [1.17.0](http://bitbucket.org/mbari/deepsea-track/compare/v1.16.3...v1.17.0) (2021-12-05)
 
 
