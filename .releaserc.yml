@@ -18,6 +18,14 @@
                     "CHANGELOG.md"
                 ]
             }
+        ],
+        [
+            "@semantic-release/exec",
+          {
+            "prepareCmd": "echo ${nextRelease.version} > VERSION.txt",
+            "publishCmd": "version=$(cat VERSION.txt) && git commit -m 'build: bumped version' VERSION.txt"
+          }
         ]
+
     ]
 }    
