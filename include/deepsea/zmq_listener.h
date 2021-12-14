@@ -21,8 +21,10 @@
 ///\file  ZMQListener.h  Listens for events across frames*/
 
 #include <deepsea/visual_event.h>
+#include <zmq.hpp>
 
 using namespace std;
+using namespace zmq;
 
 namespace deepsea {
 
@@ -36,33 +38,25 @@ namespace deepsea {
         ~ZMQListener();
 
         /// \brief listens for VOC events sent over a ZeroMQ socket
-        void listen();
+        void listen(list<EventObject> &objects, unsigned int frame_num);
 
-        //! Returns visual objects at frame_num
-        list<EventObject> getObjects(unsigned int frame_num) const;
+        /// \brief initializes ZeroMQ socket
+        void init();
 
-        ///! Stop listening
-        void stop();
-
-        ///! True if communication started
-        bool started();
-
-        void cleanUp(const unsigned int max_frame);
-
-        bool initialized();
+         //! True if this is a valid zmq object that should be initialized
+        bool valid();
 
         // Frame number of the last message received
         int lastFrameNum();
 
     private:
 
-        list<EventObject> objects_;
+        context_t context_;
+        socket_t subscriber_;
         string address_;
         string topic_;
-        int last_frame_num_;
-        bool stopped_;
         bool started_;
-        bool initialized_;
+        bool valid_;
         float tracker_height_;
         float tracker_width_;
     };

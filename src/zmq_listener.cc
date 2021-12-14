@@ -12,92 +12,32 @@ namespace deepsea {
     ZMQListener::ZMQListener(const string address, const string topic,
                             const float tracker_width,
                             const float tracker_height):
-            stopped_(false),
             started_(false),
-            initialized_(false),
+            valid_(false),
             address_(address),
             topic_(topic),
-            last_frame_num_(-1),
+            context_(1),
+            subscriber_(context_, ZMQ_SUB),
             tracker_width_(tracker_width),
             tracker_height_(tracker_height){
         // rudimentary check for populated address/topic; todo: add check for correct protocol
         if (address.length() > 0 and topic.length() > 0)
-            initialized_ = true;
+            valid_ = true;
     }
 
 // ######################################################################
     ZMQListener::~ZMQListener() {
-        objects_.clear();
     }
 
 // ######################################################################
-    list<EventObject> ZMQListener::getObjects(unsigned int frame_num) const {
-        list<EventObject> result;
-        list<EventObject>::const_iterator evt;
-        for (evt = objects_.begin(); evt != objects_.end(); ++evt)
-            if (evt->getFrameNum() == frame_num)
-                result.push_back(*evt);
-
-        return result;
-    }
-
-// ######################################################################
-    void ZMQListener::listen() {
+    void ZMQListener::init() {
 
         try {
-            zmq::context_t context(1);
-            zmq::socket_t subscriber(context, ZMQ_SUB);
-            const std::chrono::milliseconds timeout{120000};
+            const std::chrono::milliseconds timeout{120000000};
             string start_msg = "start";
-            zmq::message_t msg;
-            subscriber.connect(address_);
-            subscriber.set(zmq::sockopt::subscribe, topic_);
-            zmq::pollitem_t item[0];
-            item[0].socket = subscriber;
-            item[0].events = ZMQ_POLLIN;
-            int rc = zmq::poll(item, 1, timeout); // poll for timeout period only
-            assert(rc == 1); //todo put a meaningful message here if does timeout. rc=1 means it returned one item
+            subscriber_.connect(address_);
+            subscriber_.set(zmq::sockopt::subscribe, topic_);
             this->started_ = true;
-            cout << "Listening for visual events topic " << topic_ << " on " << address_ << endl;
-            while(!stopped_) {
-                string s = string(static_cast<char*>(msg.data()), msg.size());
-                float xmin, xmax, ymin, ymax;
-                float class_score;
-                string class_name;
-                if(s == topic_) {
-                    zmq::message_t json_msg;
-                    subscriber.recv(json_msg, zmq::recv_flags::none);
-                    string json_str = string(static_cast<char*>(json_msg.data()), json_msg.size());
-                    nlohmann::json vocs = nlohmann::json::parse(json_str);
-                    if (vocs.size() > 0) {
-                        cout << vocs << endl;
-                        cout << vocs.size() << endl;
-                        for (int i=0; i < vocs.size(); i++) {
-                            if (vocs[i].is_object()) {
-                                string xmn = vocs[i]["xmin"]; xmin = std::stof(xmn);
-                                string xmx = vocs[i]["xmax"]; xmax = std::stof(xmx);
-                                string ymn = vocs[i]["ymin"]; ymin = std::stof(ymn);
-                                string ymx = vocs[i]["ymax"]; ymax = std::stof(ymx);
-                                string class_name = vocs[i]["class_name"];
-                                string score = vocs[i]["class_score"]; class_score = std::stof(score);
-                                string frame_num = vocs[i]["frame_num"];
-                                this->last_frame_num_ = std::stoi(frame_num);
-                                // rescale and store in EventObject
-                                Rect box = Rect(int(tracker_width_*xmin),
-                                        int(tracker_height_*ymin),
-                                        int(tracker_width_*(xmax - xmin)),
-                                        int(tracker_height_*(ymax - ymin)));
-                                VOCObject v(class_name, class_score, box);
-                                objects_.push_back(EventObject(v, 0, this->last_frame_num_));
-                            }
-                        }
-                    }
-                }
-            }
-            // cease any blocking operations in progress
-            context.shutdown();
-            // shutdown
-            context.close();
         }
         catch (zmq::error_t error) {
             cout << error.what() << endl;
@@ -106,36 +46,60 @@ namespace deepsea {
     }
 
 // ######################################################################
-    void ZMQListener::cleanUp(const unsigned int max_frame) {
-        list<EventObject>::iterator e = objects_.begin();
+    void ZMQListener::listen(list<EventObject> &objects, unsigned int target_frame_num) {
 
-        while (e != objects_.end()) {
-            list<EventObject>::iterator next = e;
-            ++next;
-            if (e->getFrameNum() < max_frame) {
-                objects_.erase(e);
+        try {
+            zmq::message_t msg;
+            cout << "Listening for visual events topic " << topic_ << " on " << address_ << " frame " << target_frame_num << "..." << endl;
+
+            while(true) {
+                subscriber_.recv(msg, zmq::recv_flags::none);
+                string s = string(static_cast<char*>(msg.data()), msg.size());
+                float xmin, xmax, ymin, ymax;
+                float class_score;
+                string class_name;
+                if(s == topic_) {
+                    zmq::message_t json_msg;
+                    subscriber_.recv(json_msg, zmq::recv_flags::none);
+                    string json_str = string(static_cast<char*>(json_msg.data()), json_msg.size());
+                    nlohmann::json vocs = nlohmann::json::parse(json_str);
+                    if (vocs.size() > 0) {
+                        cout << vocs << endl;
+                        cout << vocs.size() << endl;
+                        for (int i=0; i < vocs.size(); i++) {
+                            string frame_num = vocs[i]["frame_num"];
+                            unsigned int recvd_frame = (unsigned int )std::stoi(frame_num);
+                            if (vocs[i].is_object() && target_frame_num == recvd_frame) {
+                                string xmn = vocs[i]["xmin"]; xmin = std::stof(xmn);
+                                string xmx = vocs[i]["xmax"]; xmax = std::stof(xmx);
+                                string ymn = vocs[i]["ymin"]; ymin = std::stof(ymn);
+                                string ymx = vocs[i]["ymax"]; ymax = std::stof(ymx);
+                                string class_name = vocs[i]["class_name"];
+                                string score = vocs[i]["class_score"]; class_score = std::stof(score);
+                                // rescale and store in EventObject
+                                Rect box = Rect(int(tracker_width_*xmin),
+                                                int(tracker_height_*ymin),
+                                                int(tracker_width_*(xmax - xmin)),
+                                                int(tracker_height_*(ymax - ymin)));
+                                VOCObject v(class_name, class_score, box);
+                                objects.push_back(EventObject(v, 0, target_frame_num));
+                            }
+                        }
+                    }
+                    cout << "Received " << objects.size() << " objects" << " for topic " << topic_ << " on " << address_ << " frame " << target_frame_num << endl;
+                    return;
+                }
             }
-        e = next;
-        } // end for loop over events
+        }
+        catch (zmq::error_t error) {
+            cout << error.what() << endl;
+            exit(-1);
+        }
     }
 
-// ######################################################################
-    void ZMQListener::stop() {
-        stopped_ = true;
-    }
 
 // ######################################################################
-    bool ZMQListener::started() {
-        return this->started_;
-    }
-
-// ######################################################################
-    bool ZMQListener::initialized() {
-        return this->initialized_;
-    }
-
-// ######################################################################
-    int ZMQListener::lastFrameNum() {
-        return this->last_frame_num_;
+    bool ZMQListener::valid() {
+        return this->valid_;
     }
 }
