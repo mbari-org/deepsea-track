@@ -27,10 +27,6 @@ namespace deepsea {
 
 // ######################################################################
     ZMQListener::~ZMQListener() {
-        // cease any blocking operations in progress
-        context_.shutdown();
-        // shutdown
-        context_.close();
     }
 
 // ######################################################################
