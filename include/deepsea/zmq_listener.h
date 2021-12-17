@@ -31,9 +31,7 @@ namespace deepsea {
     class ZMQListener  {
 
     public:
-        ZMQListener(const string address, const string topic,
-                    const float tracker_width,
-                    const float tracker_height);
+        ZMQListener(const string address, const float tracker_width, const float tracker_height);
 
         ~ZMQListener();
 
@@ -46,15 +44,11 @@ namespace deepsea {
          //! True if this is a valid zmq object that should be initialized
         bool valid();
 
-        // Frame number of the last message received
-        int lastFrameNum();
-
     private:
 
         context_t context_;
-        socket_t subscriber_;
+        socket_t server_;
         string address_;
-        string topic_;
         bool started_;
         bool valid_;
         float tracker_height_;

@@ -57,8 +57,6 @@ namespace deepsea {
                  "absolute path to directory with voc xml files. If absent, --address and --topic must be set")
                 ("address", po::value<string>(&address_),
                         "socket address for the detector output, e.g. tcp://127.0.0.1:6432")
-                ("topic", po::value<string>(&topic_),
-                        "topic to listen on at address, e.g. VisualEvents ")
                 ("xml_format", po::value<string>(&xml_format_)->default_value("f%06d.xml"),
                         "format of the xml input files. defaults to f%06d.xml")
                 ;
@@ -161,9 +159,6 @@ namespace deepsea {
             else {
                 cout << "Input path with xml detections was set to " << xml_path_ << endl;
             }
-        }
-        if (vm.count("topic") && vm.count("address")) {
-            cout << "Listening for topic " << topic_ << " at " << address_ << endl;
         }
         return failure;
 

@@ -103,7 +103,7 @@ int main( int argc, char** argv ) {
         parser = new XercesDOMParser;
     }
 
-    ZMQListener zmq(args.address_, args.topic_, tracker_width, tracker_height);
+    ZMQListener zmq(args.address_, tracker_width, tracker_height);
 
     //////////////////////////////////////////////////////////
     // begin processing
@@ -153,8 +153,8 @@ int main( int argc, char** argv ) {
                     }
                 }
             }
-            else { // otherwise, read detections sent over zmq; these are zero indexed so subtract by 1 here
-                zmq.listen(event_objs, frame_num - 1);
+            else {
+                zmq.listen(event_objs, frame_num);
             }
         }
 
@@ -169,6 +169,7 @@ int main( int argc, char** argv ) {
             && events_last.size() == 0
             && (cfg.display() || cfg.createVideo()) ) {
             frame_num +=1;
+            frame.release();
             continue;
         }
 
