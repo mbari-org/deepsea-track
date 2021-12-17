@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+## [1.17.4](http://bitbucket.org/mbari/deepsea-track/compare/v1.17.3...v1.17.4) (2021-12-17)
+
+
+### Performance Improvements
+
+* switch to zmq client/server model, 1-based frame from detector, and release frame if no detections ([ab3fbd6](http://bitbucket.org/mbari/deepsea-track/commits/ab3fbd6ac9e5d3defb54905a096ac29b515ec202))
+
 ## [1.17.3](http://bitbucket.org/mbari/deepsea-track/compare/v1.17.2...v1.17.3) (2021-12-17)
 
 
