@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+## [1.17.3](http://bitbucket.org/mbari/deepsea-track/compare/v1.17.2...v1.17.3) (2021-12-17)
+
+
+### Bug Fixes
+
+* correct zmq frame indexing ([d5a49fc](http://bitbucket.org/mbari/deepsea-track/commits/d5a49fc33549f4d5ef399a988e06f4b9a25a8c79))
+
 ## [1.17.2](http://bitbucket.org/mbari/deepsea-track/compare/v1.17.1...v1.17.2) (2021-12-14)
 
 
