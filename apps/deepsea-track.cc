@@ -153,8 +153,8 @@ int main( int argc, char** argv ) {
                     }
                 }
             }
-            else { // otherwise, read detections sent over zmq
-                zmq.listen(event_objs, frame_num);
+            else { // otherwise, read detections sent over zmq; these are zero indexed so subtract by 1 here
+                zmq.listen(event_objs, frame_num - 1);
             }
         }
 
