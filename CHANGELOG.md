@@ -1,5 +1,12 @@
 # DeepSea Track Changelog
 
+## [1.17.5](http://bitbucket.org/mbari/deepsea-track/compare/v1.17.4...v1.17.5) (2021-12-18)
+
+
+### Bug Fixes
+
+* correct location for ACK ([114123c](http://bitbucket.org/mbari/deepsea-track/commits/114123cc0e8949fc5b4181c89417495e5dddff12))
+
 ## [1.17.4](http://bitbucket.org/mbari/deepsea-track/compare/v1.17.3...v1.17.4) (2021-12-17)
 
 
