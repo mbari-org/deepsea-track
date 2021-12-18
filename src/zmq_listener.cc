@@ -84,8 +84,8 @@ namespace deepsea {
                             found = true;
                         }
                     }
+                    server_.send(ack);
                 }
-                server_.send(ack);
                 if (objects.size() > 0) {
                     cout << "Received " << objects.size() << " objects" << " on " << address_ << " frame "
                          << target_frame_num << endl;
